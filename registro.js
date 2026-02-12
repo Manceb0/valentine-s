@@ -96,6 +96,38 @@ if (formPaso1) {
   });
 }
 
+// Chip selection logic
+function initChips() {
+  document.querySelectorAll(".chip-group").forEach((group) => {
+    const max = parseInt(group.dataset.max) || 1;
+    group.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        if (chip.classList.contains("selected")) {
+          chip.classList.remove("selected");
+        } else {
+          const selected = group.querySelectorAll(".chip.selected");
+          if (selected.length >= max) {
+            // If max reached, deselect the oldest one
+            selected[0].classList.remove("selected");
+          }
+          chip.classList.add("selected");
+        }
+      });
+    });
+  });
+}
+
+function getChipValues(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return null;
+  const selected = group.querySelectorAll(".chip.selected");
+  if (selected.length === 0) return null;
+  const values = Array.from(selected).map((c) => c.dataset.value);
+  return values.join(", ");
+}
+
+initChips();
+
 // Paso 2: resto -> UPDATE
 const formPaso2 = document.getElementById("form-paso-2");
 if (formPaso2) {
@@ -115,14 +147,14 @@ if (formPaso2) {
     }
 
     const fecha_nacimiento = document.getElementById("fecha_nacimiento").value || null;
-    const carrera = document.getElementById("carrera").value || null;
-    const signo_zodiacal = document.getElementById("signo_zodiacal").value || null;
+    const carrera = getChipValues("carrera");
+    const signo_zodiacal = getChipValues("signo_zodiacal");
     const respuestas = {
-      color_favorito: document.getElementById("color_favorito")?.value?.trim() || null,
-      tiempo_libre: document.getElementById("tiempo_libre")?.value?.trim() || null,
-      musica_favorita: document.getElementById("musica_favorita")?.value?.trim() || null,
-      lugar_visitar: document.getElementById("lugar_visitar")?.value?.trim() || null,
-      algo_feliz: document.getElementById("algo_feliz")?.value?.trim() || null,
+      color_favorito: getChipValues("color_favorito"),
+      tiempo_libre: getChipValues("tiempo_libre"),
+      musica_favorita: getChipValues("musica_favorita"),
+      lugar_visitar: getChipValues("lugar_visitar"),
+      algo_feliz: getChipValues("algo_feliz"),
     };
 
     let supabase;

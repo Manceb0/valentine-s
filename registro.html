@@ -53,57 +53,117 @@
           <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
         </div>
         <div class="form-group">
-          <label for="carrera">Carrera</label>
-          <select id="carrera" name="carrera">
-            <option value="">Selecciona una carrera</option>
-            <option value="Ingeniería">Ingeniería</option>
-            <option value="Medicina">Medicina</option>
-            <option value="Derecho">Derecho</option>
-            <option value="Administración">Administración</option>
-            <option value="Arquitectura">Arquitectura</option>
-            <option value="Psicología">Psicología</option>
-            <option value="Comunicación">Comunicación</option>
-            <option value="Diseño">Diseño</option>
-            <option value="Otra">Otra</option>
-          </select>
+          <label>Carrera</label>
+          <div class="chip-group" id="carrera" data-max="1">
+            <button type="button" class="chip" data-value="Ingeniería">🔧 Ingeniería</button>
+            <button type="button" class="chip" data-value="Medicina">🩺 Medicina</button>
+            <button type="button" class="chip" data-value="Derecho">⚖️ Derecho</button>
+            <button type="button" class="chip" data-value="Administración">📊 Administración</button>
+            <button type="button" class="chip" data-value="Arquitectura">🏗️ Arquitectura</button>
+            <button type="button" class="chip" data-value="Psicología">🧠 Psicología</button>
+            <button type="button" class="chip" data-value="Comunicación">📡 Comunicación</button>
+            <button type="button" class="chip" data-value="Diseño">🎨 Diseño</button>
+            <button type="button" class="chip" data-value="Contaduría">📋 Contaduría</button>
+            <button type="button" class="chip" data-value="Otra">📝 Otra</button>
+          </div>
         </div>
         <div class="form-group">
-          <label for="signo_zodiacal">Signo zodiacal</label>
-          <select id="signo_zodiacal" name="signo_zodiacal">
-            <option value="">Selecciona tu signo</option>
-            <option value="Aries">Aries</option>
-            <option value="Tauro">Tauro</option>
-            <option value="Géminis">Géminis</option>
-            <option value="Cáncer">Cáncer</option>
-            <option value="Leo">Leo</option>
-            <option value="Virgo">Virgo</option>
-            <option value="Libra">Libra</option>
-            <option value="Escorpio">Escorpio</option>
-            <option value="Sagitario">Sagitario</option>
-            <option value="Capricornio">Capricornio</option>
-            <option value="Acuario">Acuario</option>
-            <option value="Piscis">Piscis</option>
-          </select>
+          <label>Signo zodiacal</label>
+          <div class="chip-group chip-group-zodiac" id="signo_zodiacal" data-max="1">
+            <button type="button" class="chip" data-value="Aries">♈ Aries</button>
+            <button type="button" class="chip" data-value="Tauro">♉ Tauro</button>
+            <button type="button" class="chip" data-value="Géminis">♊ Géminis</button>
+            <button type="button" class="chip" data-value="Cáncer">♋ Cáncer</button>
+            <button type="button" class="chip" data-value="Leo">♌ Leo</button>
+            <button type="button" class="chip" data-value="Virgo">♍ Virgo</button>
+            <button type="button" class="chip" data-value="Libra">♎ Libra</button>
+            <button type="button" class="chip" data-value="Escorpio">♏ Escorpio</button>
+            <button type="button" class="chip" data-value="Sagitario">♐ Sagitario</button>
+            <button type="button" class="chip" data-value="Capricornio">♑ Capricornio</button>
+            <button type="button" class="chip" data-value="Acuario">♒ Acuario</button>
+            <button type="button" class="chip" data-value="Piscis">♓ Piscis</button>
+          </div>
         </div>
         <div class="form-group">
-          <label for="color_favorito">Color favorito</label>
-          <input type="text" id="color_favorito" name="color_favorito" placeholder="Ej: Azul" maxlength="50">
+          <label>Color favorito</label>
+          <div class="chip-group" id="color_favorito" data-max="1">
+            <button type="button" class="chip chip-color" data-value="Rojo"><span class="chip-dot" style="background:#e74c3c"></span>Rojo</button>
+            <button type="button" class="chip chip-color" data-value="Azul"><span class="chip-dot" style="background:#3498db"></span>Azul</button>
+            <button type="button" class="chip chip-color" data-value="Rosa"><span class="chip-dot" style="background:#ff69b4"></span>Rosa</button>
+            <button type="button" class="chip chip-color" data-value="Morado"><span class="chip-dot" style="background:#9b59b6"></span>Morado</button>
+            <button type="button" class="chip chip-color" data-value="Verde"><span class="chip-dot" style="background:#2ecc71"></span>Verde</button>
+            <button type="button" class="chip chip-color" data-value="Negro"><span class="chip-dot" style="background:#2c3e50"></span>Negro</button>
+            <button type="button" class="chip chip-color" data-value="Blanco"><span class="chip-dot" style="background:#ecf0f1"></span>Blanco</button>
+            <button type="button" class="chip chip-color" data-value="Amarillo"><span class="chip-dot" style="background:#f1c40f"></span>Amarillo</button>
+            <button type="button" class="chip chip-color" data-value="Naranja"><span class="chip-dot" style="background:#e67e22"></span>Naranja</button>
+          </div>
         </div>
         <div class="form-group">
-          <label for="tiempo_libre">¿Qué te gusta hacer en tu tiempo libre?</label>
-          <input type="text" id="tiempo_libre" name="tiempo_libre" placeholder="Ej: Leer, deporte" maxlength="150">
+          <label>¿Qué te gusta hacer en tu tiempo libre?</label>
+          <p class="chip-hint">Puedes elegir varias</p>
+          <div class="chip-group" id="tiempo_libre" data-max="3">
+            <button type="button" class="chip" data-value="Deporte">⚽ Deporte</button>
+            <button type="button" class="chip" data-value="Leer">📚 Leer</button>
+            <button type="button" class="chip" data-value="Música">🎵 Música</button>
+            <button type="button" class="chip" data-value="Videojuegos">🎮 Videojuegos</button>
+            <button type="button" class="chip" data-value="Cocinar">🍳 Cocinar</button>
+            <button type="button" class="chip" data-value="Viajar">✈️ Viajar</button>
+            <button type="button" class="chip" data-value="Series/Películas">🎬 Series/Pelis</button>
+            <button type="button" class="chip" data-value="Bailar">💃 Bailar</button>
+            <button type="button" class="chip" data-value="Arte">🎨 Arte</button>
+            <button type="button" class="chip" data-value="Dormir">😴 Dormir</button>
+            <button type="button" class="chip" data-value="Salir con amigos">🥳 Salir con amigos</button>
+            <button type="button" class="chip" data-value="Naturaleza">🌿 Naturaleza</button>
+          </div>
         </div>
         <div class="form-group">
-          <label for="musica_favorita">Música favorita</label>
-          <input type="text" id="musica_favorita" name="musica_favorita" placeholder="Ej: Rock, pop" maxlength="80">
+          <label>Música favorita</label>
+          <p class="chip-hint">Puedes elegir varias</p>
+          <div class="chip-group" id="musica_favorita" data-max="3">
+            <button type="button" class="chip" data-value="Reggaetón">Reggaetón</button>
+            <button type="button" class="chip" data-value="Pop">Pop</button>
+            <button type="button" class="chip" data-value="Rock">Rock</button>
+            <button type="button" class="chip" data-value="Bachata">Bachata</button>
+            <button type="button" class="chip" data-value="Salsa">Salsa</button>
+            <button type="button" class="chip" data-value="Electrónica">Electrónica</button>
+            <button type="button" class="chip" data-value="R&B">R&B</button>
+            <button type="button" class="chip" data-value="Hip Hop">Hip Hop</button>
+            <button type="button" class="chip" data-value="Indie">Indie</button>
+            <button type="button" class="chip" data-value="Clásica">Clásica</button>
+            <button type="button" class="chip" data-value="Vallenato">Vallenato</button>
+            <button type="button" class="chip" data-value="De todo">De todo</button>
+          </div>
         </div>
         <div class="form-group">
-          <label for="lugar_visitar">Un lugar que te gustaría visitar</label>
-          <input type="text" id="lugar_visitar" name="lugar_visitar" placeholder="Ej: París" maxlength="80">
+          <label>Un lugar que te gustaría visitar</label>
+          <div class="chip-group" id="lugar_visitar" data-max="1">
+            <button type="button" class="chip" data-value="París">🗼 París</button>
+            <button type="button" class="chip" data-value="Tokio">🏯 Tokio</button>
+            <button type="button" class="chip" data-value="Nueva York">🗽 Nueva York</button>
+            <button type="button" class="chip" data-value="Roma">🏛️ Roma</button>
+            <button type="button" class="chip" data-value="Bali">🏝️ Bali</button>
+            <button type="button" class="chip" data-value="Londres">🎡 Londres</button>
+            <button type="button" class="chip" data-value="Maldivas">🌊 Maldivas</button>
+            <button type="button" class="chip" data-value="Dubái">🌆 Dubái</button>
+            <button type="button" class="chip" data-value="Grecia">🏺 Grecia</button>
+            <button type="button" class="chip" data-value="Cancún">🌴 Cancún</button>
+          </div>
         </div>
         <div class="form-group">
-          <label for="algo_feliz">Algo que te hace feliz</label>
-          <input type="text" id="algo_feliz" name="algo_feliz" placeholder="Ej: Mi familia" maxlength="150">
+          <label>Algo que te hace feliz</label>
+          <p class="chip-hint">Puedes elegir varias</p>
+          <div class="chip-group" id="algo_feliz" data-max="3">
+            <button type="button" class="chip" data-value="Mi familia">👨‍👩‍👧 Mi familia</button>
+            <button type="button" class="chip" data-value="Mis amigos">👯 Mis amigos</button>
+            <button type="button" class="chip" data-value="La música">🎶 La música</button>
+            <button type="button" class="chip" data-value="Viajar">🌍 Viajar</button>
+            <button type="button" class="chip" data-value="Comer rico">🍕 Comer rico</button>
+            <button type="button" class="chip" data-value="Los animales">🐶 Los animales</button>
+            <button type="button" class="chip" data-value="El amor">❤️ El amor</button>
+            <button type="button" class="chip" data-value="Estar tranquilo">🧘 Estar tranquilo</button>
+            <button type="button" class="chip" data-value="Aprender cosas nuevas">💡 Aprender cosas nuevas</button>
+            <button type="button" class="chip" data-value="Los atardeceres">🌅 Los atardeceres</button>
+          </div>
         </div>
         <button type="submit" class="registro-submit" id="btn-enviar">Enviar</button>
         <p id="registro-error-2" class="registro-error" style="display: none;"></p>
