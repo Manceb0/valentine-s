@@ -845,42 +845,57 @@ function updateMatchArea() {
 }
 
 function calculateCompatibilityMain(answersA, answersB) {
-  const binaryFields = [
+  // Light questions (peso 1)
+  const lightFields = [
     "prefer_dinero_amor", "prefer_playa_montana", "prefer_noche_dia",
-    "prefer_netflix_fiesta", "prefer_perros_gatos", "prefer_llamada_mensaje",
-    "prefer_cafe_chocolate"
+    "prefer_netflix_fiesta"
+  ];
+
+  // Deep questions (peso 2)
+  const deepFields = [
+    "prefer_perdonar_justicia", "prefer_hablar_espacio", "prefer_razon_corazon",
+    "prefer_planificar_improvisar", "prefer_pocas_muchas", "prefer_feliz_razon",
+    "prefer_presente_futuro", "prefer_dar_recibir"
   ];
 
   let totalPoints = 0;
   let maxPoints = 0;
 
-  // Binary preferences (7 questions)
-  binaryFields.forEach((field) => {
+  lightFields.forEach((field) => {
     maxPoints += 1;
     const a = answersA[field];
     const b = answersB[field];
-    if (a && b && a === b) {
-      totalPoints += 1;
-    }
+    if (a && b && a === b) totalPoints += 1;
   });
 
-  // Color favorito
+  deepFields.forEach((field) => {
+    maxPoints += 2;
+    const a = answersA[field];
+    const b = answersB[field];
+    if (a && b && a === b) totalPoints += 2;
+  });
+
+  // Color favorito (1 pt)
   maxPoints += 1;
   if (answersA.color_favorito && answersB.color_favorito) {
-    if (answersA.color_favorito === answersB.color_favorito) {
-      totalPoints += 1;
-    }
+    if (answersA.color_favorito === answersB.color_favorito) totalPoints += 1;
   }
 
-  // Multi-select fields
-  ["musica_favorita", "algo_feliz"].forEach((field) => {
-    maxPoints += 1;
+  // Multi-select: valores_relacion (peso 2), musica_favorita (1), algo_feliz (1)
+  const multiFields = [
+    { field: "valores_relacion", weight: 2 },
+    { field: "musica_favorita", weight: 1 },
+    { field: "algo_feliz", weight: 1 },
+  ];
+
+  multiFields.forEach(({ field, weight }) => {
+    maxPoints += weight;
     const listA = Array.isArray(answersA[field]) ? answersA[field] : [];
     const listB = Array.isArray(answersB[field]) ? answersB[field] : [];
     if (listA.length > 0 && listB.length > 0) {
       const overlap = listA.filter((v) => listB.includes(v));
       const maxLen = Math.max(listA.length, listB.length);
-      totalPoints += maxLen > 0 ? overlap.length / maxLen : 0;
+      totalPoints += maxLen > 0 ? (overlap.length / maxLen) * weight : 0;
     }
   });
 
@@ -889,12 +904,12 @@ function calculateCompatibilityMain(answersA, answersB) {
 }
 
 function getCompatibilityTextMain(percentage) {
-  if (percentage >= 90) return { label: "¡Almas Gemelas!", text: "Su conexión es increíble. Comparten una visión de la vida casi idéntica." };
-  if (percentage >= 75) return { label: "¡Gran Conexión!", text: "Tienen una química especial. Sus gustos se alinean de manera muy natural." };
-  if (percentage >= 60) return { label: "¡Buena Onda!", text: "Se complementan en lo importante y cada uno aporta algo diferente." };
-  if (percentage >= 45) return { label: "¡Interesante!", text: "Los opuestos se atraen. Esas diferencias pueden generar una chispa increíble." };
-  if (percentage >= 30) return { label: "¡Polos Opuestos!", text: "Son diferentes, pero pueden aprender muchísimo el uno del otro." };
-  return { label: "¡El Reto del Amor!", text: "Son mundos distintos, pero el amor todo lo puede." };
+  if (percentage >= 90) return { label: "¡ALMAS GEMELAS!", text: "Comparten valores profundos y ven la vida de forma similar." };
+  if (percentage >= 75) return { label: "¡GRAN CONEXIÓN!", text: "Piensan parecido en lo que realmente importa." };
+  if (percentage >= 60) return { label: "¡BUENA ONDA!", text: "Coinciden en lo importante, donde difieren se complementan." };
+  if (percentage >= 45) return { label: "¡INTERESANTE!", text: "Un equilibrio curioso de coincidencias y diferencias." };
+  if (percentage >= 30) return { label: "¡POLOS OPUESTOS!", text: "Muy diferentes, pero las mejores historias nacen así." };
+  return { label: "¡EL RETO DEL AMOR!", text: "Mundos distintos, pero el amor no se trata de ser iguales." };
 }
 
 function showMainResult(answersA, answersB) {

@@ -2,7 +2,7 @@ const params = new URLSearchParams(window.location.search);
 let sujeto = params.get("sujeto") || "";
 let codigo = params.get("codigo") || "";
 
-const TOTAL_STEPS = 13; // steps 0-12
+const TOTAL_STEPS = 19; // steps 0-18
 let currentStep = -1;
 let answers = {};
 let registroId = null;
@@ -363,8 +363,11 @@ async function submitAllAnswers() {
   const respuestas = {};
   const answerFields = [
     "prefer_dinero_amor", "prefer_playa_montana", "prefer_noche_dia",
-    "prefer_netflix_fiesta", "prefer_perros_gatos", "prefer_llamada_mensaje",
-    "prefer_cafe_chocolate", "color_favorito", "musica_favorita", "algo_feliz"
+    "prefer_netflix_fiesta",
+    "prefer_perdonar_justicia", "prefer_hablar_espacio", "prefer_razon_corazon",
+    "prefer_planificar_improvisar", "prefer_pocas_muchas", "prefer_feliz_razon",
+    "prefer_presente_futuro", "prefer_dar_recibir",
+    "color_favorito", "valores_relacion", "musica_favorita", "algo_feliz"
   ];
   answerFields.forEach((f) => {
     if (answers[f] !== undefined) respuestas[f] = answers[f];
@@ -445,10 +448,24 @@ async function pollForPartner(supabase) {
 
 // ————— COMPATIBILITY CALCULATION —————
 function calculateCompatibility(myAnswers, partnerAnswers) {
-  const binaryFields = [
-    "prefer_dinero_amor", "prefer_playa_montana", "prefer_noche_dia",
-    "prefer_netflix_fiesta", "prefer_perros_gatos", "prefer_llamada_mensaje",
-    "prefer_cafe_chocolate"
+  // Light questions (peso 1)
+  const lightFields = [
+    { field: "prefer_dinero_amor", label: "Dinero vs Amor" },
+    { field: "prefer_playa_montana", label: "Playa vs Montaña" },
+    { field: "prefer_noche_dia", label: "Noche vs Día" },
+    { field: "prefer_netflix_fiesta", label: "Netflix vs Fiesta" },
+  ];
+
+  // Deep questions (peso 2 — valen el doble)
+  const deepFields = [
+    { field: "prefer_perdonar_justicia", label: "Perdón vs Consecuencias" },
+    { field: "prefer_hablar_espacio", label: "Hablarlo vs Dar espacio" },
+    { field: "prefer_razon_corazon", label: "Razón vs Corazón" },
+    { field: "prefer_planificar_improvisar", label: "Planificar vs Improvisar" },
+    { field: "prefer_pocas_muchas", label: "Pocas amistades vs Muchas" },
+    { field: "prefer_feliz_razon", label: "Ser feliz vs Tener razón" },
+    { field: "prefer_presente_futuro", label: "Presente vs Futuro" },
+    { field: "prefer_dar_recibir", label: "Dar vs Recibir cariño" },
   ];
 
   let totalPoints = 0;
@@ -456,32 +473,37 @@ function calculateCompatibility(myAnswers, partnerAnswers) {
   const matches = [];
   const diffs = [];
 
-  const labels = {
-    prefer_dinero_amor: { emoji: "💰❤️", label: "Dinero vs Amor" },
-    prefer_playa_montana: { emoji: "🏖️🏔️", label: "Playa vs Montaña" },
-    prefer_noche_dia: { emoji: "🌙☀️", label: "Noche vs Día" },
-    prefer_netflix_fiesta: { emoji: "🎬🎉", label: "Netflix vs Fiesta" },
-    prefer_perros_gatos: { emoji: "🐶🐱", label: "Perros vs Gatos" },
-    prefer_llamada_mensaje: { emoji: "📞💬", label: "Llamada vs Mensaje" },
-    prefer_cafe_chocolate: { emoji: "☕🍫", label: "Café vs Chocolate" },
-  };
-
-  // Binary preferences (7 questions)
-  binaryFields.forEach((field) => {
+  // Light (1 pt each)
+  lightFields.forEach(({ field, label }) => {
     maxPoints += 1;
     const my = myAnswers[field];
     const their = partnerAnswers[field];
     if (my && their) {
       if (my === their) {
         totalPoints += 1;
-        matches.push({ icon: "✅", text: `Ambos prefieren ${my}`, emoji: labels[field]?.emoji || "" });
+        matches.push({ icon: "✅", text: `Ambos prefieren ${my}` });
       } else {
-        diffs.push({ icon: "💫", text: `${labels[field]?.label}: Tú ${my}, tu pareja ${their}` });
+        diffs.push({ icon: "💫", text: `${label}: Tú "${my}", tu pareja "${their}"` });
       }
     }
   });
 
-  // Color favorito (1 question)
+  // Deep (2 pts each)
+  deepFields.forEach(({ field, label }) => {
+    maxPoints += 2;
+    const my = myAnswers[field];
+    const their = partnerAnswers[field];
+    if (my && their) {
+      if (my === their) {
+        totalPoints += 2;
+        matches.push({ icon: "💕", text: `Ambos: "${my}"` });
+      } else {
+        diffs.push({ icon: "✨", text: `${label}: Tú "${my}", tu pareja "${their}"` });
+      }
+    }
+  });
+
+  // Color favorito (1 pt)
   maxPoints += 1;
   if (myAnswers.color_favorito && partnerAnswers.color_favorito) {
     if (myAnswers.color_favorito === partnerAnswers.color_favorito) {
@@ -492,19 +514,24 @@ function calculateCompatibility(myAnswers, partnerAnswers) {
     }
   }
 
-  // Multi-select fields: musica_favorita, algo_feliz
-  ["musica_favorita", "algo_feliz"].forEach((field) => {
-    maxPoints += 1;
+  // Multi-select: valores_relacion (peso 2), musica_favorita (peso 1), algo_feliz (peso 1)
+  const multiFields = [
+    { field: "valores_relacion", weight: 2, label: "Valores en relación" },
+    { field: "musica_favorita", weight: 1, label: "Música" },
+    { field: "algo_feliz", weight: 1, label: "Felicidad" },
+  ];
+
+  multiFields.forEach(({ field, weight, label }) => {
+    maxPoints += weight;
     const myList = Array.isArray(myAnswers[field]) ? myAnswers[field] : [];
     const theirList = Array.isArray(partnerAnswers[field]) ? partnerAnswers[field] : [];
     if (myList.length > 0 && theirList.length > 0) {
       const overlap = myList.filter((v) => theirList.includes(v));
       const maxLen = Math.max(myList.length, theirList.length);
-      const score = maxLen > 0 ? overlap.length / maxLen : 0;
+      const score = maxLen > 0 ? (overlap.length / maxLen) * weight : 0;
       totalPoints += score;
       if (overlap.length > 0) {
-        const label = field === "musica_favorita" ? "🎵 Música" : "😊 Felicidad";
-        matches.push({ icon: label.split(" ")[0], text: `Coinciden en: ${overlap.join(", ")}` });
+        matches.push({ icon: weight > 1 ? "💞" : "🎵", text: `${label}: coinciden en ${overlap.join(", ")}` });
       }
     }
   });
@@ -518,33 +545,33 @@ function calculateCompatibility(myAnswers, partnerAnswers) {
 function getCompatibilityText(percentage) {
   if (percentage >= 90) {
     return {
-      label: "¡Almas Gemelas!",
-      text: "Wow, su conexión es increíble. Comparten una visión de la vida casi idéntica. ¡El universo claramente los puso en el mismo camino! Disfruten esa energía única que comparten."
+      label: "¡ALMAS GEMELAS!",
+      text: "Su conexión es excepcional. Comparten valores profundos, ven la vida de forma similar y hasta manejan los conflictos igual. El universo los puso en el mismo camino por algo."
     };
   } else if (percentage >= 75) {
     return {
-      label: "¡Gran Conexión!",
-      text: "Tienen una química especial. Sus gustos y valores se alinean de manera muy natural. Esa mezcla de similitudes con pequeñas diferencias es la receta perfecta para algo bonito."
+      label: "¡GRAN CONEXIÓN!",
+      text: "Piensan parecido en lo que realmente importa: cómo aman, cómo resuelven problemas y qué valoran. Esa base sólida de valores compartidos es oro en cualquier relación."
     };
   } else if (percentage >= 60) {
     return {
-      label: "¡Buena Onda!",
-      text: "Hay una conexión real entre ustedes. Se complementan en lo importante y cada uno aporta algo diferente que puede enriquecer la relación. ¡Tienen potencial!"
+      label: "¡BUENA ONDA!",
+      text: "Hay una conexión real entre ustedes. Coinciden en temas importantes y donde difieren, se complementan. Esas diferencias pueden enriquecer la relación si se dan la oportunidad."
     };
   } else if (percentage >= 45) {
     return {
-      label: "¡Interesante!",
-      text: "Tienen sus similitudes y sus diferencias, y eso es emocionante. Los opuestos se atraen por algo, y esas diferencias pueden generar una chispa increíble si se dan la oportunidad."
+      label: "¡INTERESANTE!",
+      text: "Tienen un equilibrio curioso: coinciden en algunas cosas profundas pero ven el mundo de formas distintas. Eso puede generar una chispa increíble si hay apertura mutua."
     };
   } else if (percentage >= 30) {
     return {
-      label: "¡Polos Opuestos!",
-      text: "Son bastante diferentes, pero eso no es malo — ¡para nada! Las mejores parejas a veces son las que menos se parecen. Pueden aprender muchísimo el uno del otro."
+      label: "¡POLOS OPUESTOS!",
+      text: "Son bastante diferentes en cómo piensan y sienten, pero eso no es malo. Las mejores historias nacen cuando dos mundos distintos chocan y descubren que se necesitan."
     };
   } else {
     return {
-      label: "¡El Reto del Amor!",
-      text: "Son mundos distintos, pero el amor todo lo puede. Las historias más épicas empiezan cuando dos personas que no tienen nada en común descubren que se complementan de formas inesperadas."
+      label: "¡EL RETO DEL AMOR!",
+      text: "Son mundos muy distintos. Pero el verdadero amor no se trata de ser iguales, sino de elegirse a pesar de las diferencias. Si hay voluntad, pueden escribir una historia única."
     };
   }
 }
