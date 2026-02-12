@@ -1,0 +1,2 @@
+{"location":"script.js:after-imports","message":"Script module loaded, all imports succeeded","data":{"hypothesisId":"H1"},"timestamp":1770895746941}
+{"location":"script.js:launchExperience-assigned","message":"launchExperience assigned to window","data":{"hypothesisId":"H3"},"timestamp":1770895746942}

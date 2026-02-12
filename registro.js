@@ -1,14 +1,16 @@
 const params = new URLSearchParams(window.location.search);
-const sujeto = params.get("sujeto") || "A";
-const codigo = params.get("codigo") || "";
+let sujeto = params.get("sujeto") || "";
+let codigo = params.get("codigo") || "";
 
-if (codigo) {
+if (codigo && sujeto) {
   document.title = `Registro - Sujeto ${sujeto}`;
   const titleEl = document.querySelector(".registro-title");
   if (titleEl) titleEl.textContent = `Regístrate como Sujeto ${sujeto}`;
 } else {
-  const sinCodigoEl = document.getElementById("registro-sin-codigo");
-  if (sinCodigoEl) sinCodigoEl.style.display = "block";
+  const grupoCodigo = document.getElementById("grupo-codigo");
+  const grupoSujeto = document.getElementById("grupo-sujeto-manual");
+  if (grupoCodigo) grupoCodigo.style.display = "block";
+  if (grupoSujeto) grupoSujeto.style.display = "block";
 }
 
 const form = document.getElementById("form-registro");
@@ -32,7 +34,15 @@ if (form) {
     const signo_zodiacal = (document.getElementById("signo_zodiacal") || {}).value || null;
 
     if (!codigo) {
-      errorEl.textContent = "Falta el código de pareja. Escanea el QR de la pantalla.";
+      const codigoManual = (document.getElementById("codigo_manual") || {}).value || "";
+      codigo = codigoManual.trim().toUpperCase();
+    }
+    if (!sujeto) {
+      const sujetoManual = (document.getElementById("sujeto_manual") || {}).value || "A";
+      sujeto = sujetoManual;
+    }
+    if (!codigo) {
+      errorEl.textContent = "Ingresa el código de pareja que aparece en la pantalla.";
       errorEl.style.display = "block";
       btnEnviar.disabled = false;
       btnEnviar.textContent = "Enviar";
