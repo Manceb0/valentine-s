@@ -1,6 +1,20 @@
 import * as THREE from "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.module.js";
 import { Howl, Howler } from "https://cdn.jsdelivr.net/npm/howler@2.2.3/+esm";
-import { supabase } from "./supabaseClient.js";
+
+// #region agent log
+try {
+  fetch("http://127.0.0.1:7242/ingest/2e670ee4-5f89-4f2b-9841-117c6890c6a5", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "script.js:after-imports",
+      message: "Script module loaded, all imports succeeded",
+      data: { hypothesisId: "H1" },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+} catch (_) {}
+// #endregion
 
 class DiamondHeart {
   constructor() {
@@ -688,6 +702,20 @@ async function renderPlayersQR() {
   }
 }
 
+// #region agent log
+try {
+  fetch("http://127.0.0.1:7242/ingest/2e670ee4-5f89-4f2b-9841-117c6890c6a5", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "script.js:launchExperience-assigned",
+      message: "launchExperience assigned to window",
+      data: { hypothesisId: "H3" },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+} catch (_) {}
+// #endregion
 window.launchExperience = launchExperience;
 
 // ——— Escenarios (QR, 3D, lista) ———
@@ -763,9 +791,18 @@ async function renderEscenarioQR() {
   }
 }
 
-function initListaParticipantes() {
+async function initListaParticipantes() {
   const listEl = document.getElementById("lista-participantes");
   if (!listEl) return;
+
+  let supabase;
+  try {
+    const mod = await import("./supabaseClient.js");
+    supabase = mod.supabase;
+  } catch (e) {
+    console.warn("supabaseClient no disponible (p. ej. no desplegado):", e);
+    return;
+  }
 
   function addParticipante(p) {
     const li = document.createElement("li");

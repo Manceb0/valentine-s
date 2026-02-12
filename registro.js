@@ -1,5 +1,3 @@
-import { supabase } from "./supabaseClient.js";
-
 const params = new URLSearchParams(window.location.search);
 const sujeto = params.get("sujeto") || "A";
 const codigo = params.get("codigo") || "";
@@ -35,6 +33,18 @@ if (form) {
 
     if (!codigo) {
       errorEl.textContent = "Falta el código de pareja. Escanea el QR de la pantalla.";
+      errorEl.style.display = "block";
+      btnEnviar.disabled = false;
+      btnEnviar.textContent = "Enviar";
+      return;
+    }
+
+    let supabase;
+    try {
+      const mod = await import("./supabaseClient.js");
+      supabase = mod.supabase;
+    } catch (e) {
+      errorEl.textContent = "No se pudo conectar. Verifica que supabaseClient.js esté desplegado.";
       errorEl.style.display = "block";
       btnEnviar.disabled = false;
       btnEnviar.textContent = "Enviar";
