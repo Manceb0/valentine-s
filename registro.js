@@ -3,9 +3,10 @@ let sujeto = params.get("sujeto") || "";
 let codigo = params.get("codigo") || "";
 
 if (codigo && sujeto) {
-  document.title = `Registro - Sujeto ${sujeto}`;
+  const corazonLabel = sujeto === "A" ? "Corazón 1" : "Corazón 2";
+  document.title = `Registro - ${corazonLabel}`;
   const titleEl = document.querySelector(".registro-title");
-  if (titleEl) titleEl.textContent = `Regístrate como Sujeto ${sujeto}`;
+  if (titleEl) titleEl.textContent = `Regístrate como ${corazonLabel}`;
 } else {
   const grupoCodigo = document.getElementById("grupo-codigo");
   const grupoSujeto = document.getElementById("grupo-sujeto-manual");
@@ -43,6 +44,7 @@ if (formPaso1) {
 
     const { codigo: c, sujeto: s } = getCodigoYSujeto();
     const nombre = document.getElementById("nombre").value.trim();
+    const genero = document.getElementById("genero_paso1")?.value?.trim() || null;
 
     if (!c) {
       errorEl.textContent = "Ingresa el código de pareja que aparece en la pantalla.";
@@ -71,9 +73,9 @@ if (formPaso1) {
           codigo_par: c,
           sujeto: s,
           nombre,
+          genero,
           fecha_nacimiento: null,
           carrera: null,
-          genero: null,
           signo_zodiacal: null,
         })
         .select("id")
@@ -114,8 +116,14 @@ if (formPaso2) {
 
     const fecha_nacimiento = document.getElementById("fecha_nacimiento").value || null;
     const carrera = document.getElementById("carrera").value || null;
-    const genero = document.getElementById("genero").value || null;
     const signo_zodiacal = document.getElementById("signo_zodiacal").value || null;
+    const respuestas = {
+      color_favorito: document.getElementById("color_favorito")?.value?.trim() || null,
+      tiempo_libre: document.getElementById("tiempo_libre")?.value?.trim() || null,
+      musica_favorita: document.getElementById("musica_favorita")?.value?.trim() || null,
+      lugar_visitar: document.getElementById("lugar_visitar")?.value?.trim() || null,
+      algo_feliz: document.getElementById("algo_feliz")?.value?.trim() || null,
+    };
 
     let supabase;
     try {
@@ -135,8 +143,8 @@ if (formPaso2) {
         .update({
           fecha_nacimiento: fecha_nacimiento || null,
           carrera,
-          genero,
           signo_zodiacal,
+          respuestas,
         })
         .eq("id", registroId);
 

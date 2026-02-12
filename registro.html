@@ -20,15 +20,25 @@
           <input type="text" id="codigo_manual" name="codigo_manual" placeholder="Ej: A7F3K2" maxlength="6" style="text-transform: uppercase;">
         </div>
         <div class="form-group" id="grupo-sujeto-manual" style="display: none;">
-          <label for="sujeto_manual">Eres Sujeto</label>
+          <label for="sujeto_manual">Eres</label>
           <select id="sujeto_manual" name="sujeto_manual">
-            <option value="A">Sujeto A</option>
-            <option value="B">Sujeto B</option>
+            <option value="A">Corazón 1</option>
+            <option value="B">Corazón 2</option>
           </select>
         </div>
         <div class="form-group">
           <label for="nombre">Nombre</label>
           <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" maxlength="100">
+        </div>
+        <div class="form-group">
+          <label for="genero_paso1">Género</label>
+          <select id="genero_paso1" name="genero_paso1" required>
+            <option value="">Selecciona</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decir">Prefiero no decir</option>
+          </select>
         </div>
         <button type="submit" class="registro-submit" id="btn-confirmar">Confirmar</button>
         <p id="registro-error" class="registro-error" style="display: none;"></p>
@@ -58,16 +68,6 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="genero">Género</label>
-          <select id="genero" name="genero">
-            <option value="">Selecciona</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Femenino">Femenino</option>
-            <option value="Otro">Otro</option>
-            <option value="Prefiero no decir">Prefiero no decir</option>
-          </select>
-        </div>
-        <div class="form-group">
           <label for="signo_zodiacal">Signo zodiacal</label>
           <select id="signo_zodiacal" name="signo_zodiacal">
             <option value="">Selecciona tu signo</option>
@@ -84,6 +84,26 @@
             <option value="Acuario">Acuario</option>
             <option value="Piscis">Piscis</option>
           </select>
+        </div>
+        <div class="form-group">
+          <label for="color_favorito">Color favorito</label>
+          <input type="text" id="color_favorito" name="color_favorito" placeholder="Ej: Azul" maxlength="50">
+        </div>
+        <div class="form-group">
+          <label for="tiempo_libre">¿Qué te gusta hacer en tu tiempo libre?</label>
+          <input type="text" id="tiempo_libre" name="tiempo_libre" placeholder="Ej: Leer, deporte" maxlength="150">
+        </div>
+        <div class="form-group">
+          <label for="musica_favorita">Música favorita</label>
+          <input type="text" id="musica_favorita" name="musica_favorita" placeholder="Ej: Rock, pop" maxlength="80">
+        </div>
+        <div class="form-group">
+          <label for="lugar_visitar">Un lugar que te gustaría visitar</label>
+          <input type="text" id="lugar_visitar" name="lugar_visitar" placeholder="Ej: París" maxlength="80">
+        </div>
+        <div class="form-group">
+          <label for="algo_feliz">Algo que te hace feliz</label>
+          <input type="text" id="algo_feliz" name="algo_feliz" placeholder="Ej: Mi familia" maxlength="150">
         </div>
         <button type="submit" class="registro-submit" id="btn-enviar">Enviar</button>
         <p id="registro-error-2" class="registro-error" style="display: none;"></p>

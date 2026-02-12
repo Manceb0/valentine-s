@@ -54,11 +54,11 @@
         <p class="qr-instruction">Escanea cada QR desde tu celular para registrarte</p>
         <div class="qr-doble-row">
           <div class="qr-doble-item">
-            <span class="qr-label">Sujeto A</span>
+            <span class="qr-label">Corazón 1</span>
             <canvas id="qrcode-canvas-a"></canvas>
           </div>
           <div class="qr-doble-item">
-            <span class="qr-label">Sujeto B</span>
+            <span class="qr-label">Corazón 2</span>
             <canvas id="qrcode-canvas-b"></canvas>
           </div>
         </div>
@@ -106,25 +106,28 @@
     <p class="players-subtitle">Juego en pareja - Escanea cada QR desde tu celular</p>
     <div class="players-inputs players-qr-row">
       <div class="player-input-group player-left" id="sujeto-a-wrap">
-        <label>Sujeto A</label>
+        <label>Corazón 1</label>
         <div class="qr-wrap" id="qr-a-wrap"><canvas id="qrcode-sujeto-a"></canvas></div>
         <div class="nombre-wrap" id="nombre-a-wrap" style="display: none;">
           <span class="nombre-registrado" id="nombre-a-display"></span>
-          <button type="button" class="btn-resetear-sujeto" id="resetear-a" aria-label="Resetear Sujeto A">Resetear</button>
+          <span class="genero-registrado" id="genero-a-display"></span>
+          <button type="button" class="btn-resetear-sujeto" id="resetear-a" aria-label="Resetear Corazón 1">Resetear</button>
         </div>
-        <p class="qr-legend" id="legend-a">Escanea para registrarte como Sujeto A</p>
+        <p class="qr-legend" id="legend-a">Escanea para registrarte como Corazón 1</p>
       </div>
       <div class="player-input-group player-right" id="sujeto-b-wrap">
-        <label>Sujeto B</label>
+        <label>Corazón 2</label>
         <div class="qr-wrap" id="qr-b-wrap"><canvas id="qrcode-sujeto-b"></canvas></div>
         <div class="nombre-wrap" id="nombre-b-wrap" style="display: none;">
           <span class="nombre-registrado" id="nombre-b-display"></span>
-          <button type="button" class="btn-resetear-sujeto" id="resetear-b" aria-label="Resetear Sujeto B">Resetear</button>
+          <span class="genero-registrado" id="genero-b-display"></span>
+          <button type="button" class="btn-resetear-sujeto" id="resetear-b" aria-label="Resetear Corazón 2">Resetear</button>
         </div>
-        <p class="qr-legend" id="legend-b">Escanea para registrarte como Sujeto B</p>
+        <p class="qr-legend" id="legend-b">Escanea para registrarte como Corazón 2</p>
       </div>
     </div>
     <p class="players-codigo" id="codigo-par-display">Código de pareja: <strong id="codigo-par-val"></strong></p>
+    <button type="button" class="btn-volver-qr" id="btn-volver-qr" style="display: none;">Ver códigos QR</button>
   </div>
 
   <div class="scene">

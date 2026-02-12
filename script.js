@@ -655,27 +655,93 @@ window.addEventListener("resize", () => {
 let codigoParActual = null;
 let sujetoAId = null;
 let sujetoBId = null;
+let mostrandoNombres = true;
+let lastParticipantA = { nombre: null, genero: null };
+let lastParticipantB = { nombre: null, genero: null };
 
-function showNombreEnPantalla(sujeto, nombre) {
+function showNombreEnPantalla(sujeto, nombre, genero) {
   const s = String(sujeto).toUpperCase();
   if (s === "A") {
+    lastParticipantA = { nombre: nombre || null, genero: genero || null };
     const qrWrap = document.getElementById("qr-a-wrap");
     const nombreWrap = document.getElementById("nombre-a-wrap");
     const display = document.getElementById("nombre-a-display");
+    const generoDisplay = document.getElementById("genero-a-display");
     const legend = document.getElementById("legend-a");
-    if (qrWrap) qrWrap.style.display = "none";
-    if (legend) legend.style.display = "none";
-    if (nombreWrap) nombreWrap.style.display = "block";
-    if (display) display.textContent = nombre || "Sujeto A";
+    if (mostrandoNombres) {
+      if (qrWrap) qrWrap.style.display = "none";
+      if (legend) legend.style.display = "none";
+      if (nombreWrap) nombreWrap.style.display = "block";
+      if (display) display.textContent = nombre || "Corazón 1";
+      if (generoDisplay) generoDisplay.textContent = genero ? " · " + genero : "";
+    }
   } else if (s === "B") {
+    lastParticipantB = { nombre: nombre || null, genero: genero || null };
     const qrWrap = document.getElementById("qr-b-wrap");
     const nombreWrap = document.getElementById("nombre-b-wrap");
     const display = document.getElementById("nombre-b-display");
+    const generoDisplay = document.getElementById("genero-b-display");
     const legend = document.getElementById("legend-b");
-    if (qrWrap) qrWrap.style.display = "none";
-    if (legend) legend.style.display = "none";
-    if (nombreWrap) nombreWrap.style.display = "block";
-    if (display) display.textContent = nombre || "Sujeto B";
+    if (mostrandoNombres) {
+      if (qrWrap) qrWrap.style.display = "none";
+      if (legend) legend.style.display = "none";
+      if (nombreWrap) nombreWrap.style.display = "block";
+      if (display) display.textContent = nombre || "Corazón 2";
+      if (generoDisplay) generoDisplay.textContent = genero ? " · " + genero : "";
+    }
+  }
+  updateVolverQrButton();
+}
+
+function setVistaQR(mostrarQR) {
+  mostrandoNombres = !mostrarQR;
+  const qrA = document.getElementById("qr-a-wrap");
+  const qrB = document.getElementById("qr-b-wrap");
+  const nomA = document.getElementById("nombre-a-wrap");
+  const nomB = document.getElementById("nombre-b-wrap");
+  const legA = document.getElementById("legend-a");
+  const legB = document.getElementById("legend-b");
+  if (mostrarQR) {
+    if (qrA) qrA.style.display = "block";
+    if (qrB) qrB.style.display = "block";
+    if (nomA) nomA.style.display = "none";
+    if (nomB) nomB.style.display = "none";
+    if (legA) legA.style.display = "block";
+    if (legB) legB.style.display = "block";
+  } else {
+    if (sujetoAId && qrA) qrA.style.display = "none";
+    if (sujetoBId && qrB) qrB.style.display = "none";
+    if (sujetoAId && nomA) nomA.style.display = "block";
+    if (sujetoBId && nomB) nomB.style.display = "block";
+    if (sujetoAId && legA) legA.style.display = "none";
+    if (sujetoBId && legB) legB.style.display = "none";
+    if (sujetoAId) {
+      const d = document.getElementById("nombre-a-display");
+      const g = document.getElementById("genero-a-display");
+      if (d) d.textContent = lastParticipantA.nombre || "Corazón 1";
+      if (g) g.textContent = lastParticipantA.genero ? " · " + lastParticipantA.genero : "";
+    }
+    if (sujetoBId) {
+      const d = document.getElementById("nombre-b-display");
+      const g = document.getElementById("genero-b-display");
+      if (d) d.textContent = lastParticipantB.nombre || "Corazón 2";
+      if (g) g.textContent = lastParticipantB.genero ? " · " + lastParticipantB.genero : "";
+    }
+  }
+  const btn = document.getElementById("btn-volver-qr");
+  if (btn) {
+    btn.textContent = mostrarQR ? "Ver participantes" : "Ver códigos QR";
+  }
+}
+
+function updateVolverQrButton() {
+  const btn = document.getElementById("btn-volver-qr");
+  if (!btn) return;
+  if (sujetoAId || sujetoBId) {
+    btn.style.display = "block";
+    btn.textContent = mostrandoNombres ? "Ver códigos QR" : "Ver participantes";
+  } else {
+    btn.style.display = "none";
   }
 }
 
@@ -713,13 +779,13 @@ async function initPlayersScreenRealtime() {
 
   const { data: existing } = await supabase
     .from("participantes_valentine")
-    .select("id, nombre, sujeto")
+    .select("id, nombre, genero, sujeto")
     .eq("codigo_par", codigoParActual);
 
   (existing || []).forEach((row) => {
     if (row.sujeto === "A") sujetoAId = row.id;
     if (row.sujeto === "B") sujetoBId = row.id;
-    showNombreEnPantalla(row.sujeto, row.nombre);
+    showNombreEnPantalla(row.sujeto, row.nombre, row.genero);
   });
 
   supabase
@@ -732,7 +798,17 @@ async function initPlayersScreenRealtime() {
         if (row.codigo_par !== codigoParActual) return;
         if (row.sujeto === "A") sujetoAId = row.id;
         if (row.sujeto === "B") sujetoBId = row.id;
-        showNombreEnPantalla(row.sujeto, row.nombre);
+        showNombreEnPantalla(row.sujeto, row.nombre, row.genero);
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "UPDATE", schema: "public", table: "participantes_valentine" },
+      (payload) => {
+        const row = payload.new;
+        if (row.codigo_par !== codigoParActual) return;
+        if (row.sujeto === "A") showNombreEnPantalla("A", row.nombre, row.genero);
+        if (row.sujeto === "B") showNombreEnPantalla("B", row.nombre, row.genero);
       }
     )
     .on(
@@ -742,9 +818,14 @@ async function initPlayersScreenRealtime() {
         const row = payload.old;
         if (row.codigo_par !== codigoParActual) return;
         showQREnPantalla(row.sujeto);
+        updateVolverQrButton();
       }
     )
     .subscribe();
+
+  document.getElementById("btn-volver-qr")?.addEventListener("click", () => {
+    setVistaQR(mostrandoNombres);
+  });
 
   document.getElementById("resetear-a")?.addEventListener("click", async () => {
     if (!sujetoAId) return;
@@ -752,7 +833,7 @@ async function initPlayersScreenRealtime() {
       const mod = await import("./supabaseClient.js");
       await mod.supabase.from("participantes_valentine").delete().eq("id", sujetoAId);
     } catch (e) {
-      console.error("Error al resetear Sujeto A:", e);
+      console.error("Error al resetear Corazón 1:", e);
     }
   });
   document.getElementById("resetear-b")?.addEventListener("click", async () => {
@@ -761,7 +842,7 @@ async function initPlayersScreenRealtime() {
       const mod = await import("./supabaseClient.js");
       await mod.supabase.from("participantes_valentine").delete().eq("id", sujetoBId);
     } catch (e) {
-      console.error("Error al resetear Sujeto B:", e);
+      console.error("Error al resetear Corazón 2:", e);
     }
   });
 }
@@ -894,7 +975,8 @@ async function initListaParticipantes() {
 
   function addParticipante(p) {
     const li = document.createElement("li");
-    const sujeto = p.sujeto ? ` (Sujeto ${escapeHtml(p.sujeto)})` : "";
+    const corazonLabel = p.sujeto === "A" ? "Corazón 1" : p.sujeto === "B" ? "Corazón 2" : p.sujeto;
+    const sujeto = p.sujeto ? ` (${escapeHtml(corazonLabel)})` : "";
     const codigo = p.codigo_par ? ` [${escapeHtml(p.codigo_par)}]` : "";
     li.innerHTML =
       "<span class=\"nombre\">" + escapeHtml(p.nombre) + "</span>" + sujeto + " <span class=\"carrera\">" + escapeHtml(p.carrera || "") + "</span>" + codigo;
