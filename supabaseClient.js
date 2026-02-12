@@ -3,7 +3,7 @@
  * En producción usa variables de entorno (ej. Vercel) o sustituye aquí.
  */
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL =
   typeof window !== "undefined" && window.__SUPABASE_URL__
