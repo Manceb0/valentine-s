@@ -447,25 +447,71 @@ async function pollForPartner(supabase) {
 }
 
 // ————— COMPATIBILITY CALCULATION —————
+
+// Mensajes humanos para cada coincidencia y diferencia
+const QUESTION_INSIGHTS = {
+  prefer_dinero_amor: {
+    matchMsg: (v) => `Los dos valoran lo mismo: ${v === "Dinero" ? "la estabilidad económica" : "el amor por encima de todo"}. Eso dice mucho de sus prioridades.`,
+    diffMsg: (my, their) => `Uno prioriza ${my === "Dinero" ? "la estabilidad material" : "los sentimientos"} y el otro ${their === "Dinero" ? "lo económico" : "el amor"}. Pueden equilibrarse si se entienden.`,
+  },
+  prefer_playa_montana: {
+    matchMsg: (v) => `¡Ambos son de ${v === "Playa" ? "arena y sal" : "aire fresco y alturas"}! Ya saben a dónde ir de vacaciones juntos.`,
+    diffMsg: (my, their) => `Uno sueña con ${my === "Playa" ? "la playa" : "la montaña"} y el otro con ${their === "Playa" ? "el mar" : "las alturas"}. Más destinos para explorar juntos.`,
+  },
+  prefer_noche_dia: {
+    matchMsg: (v) => `Los dos son personas de ${v === "Noche" ? "noche, les gusta la magia de la oscuridad" : "día, aprovechan la luz al máximo"}.`,
+    diffMsg: (my, their) => `Uno es ${my === "Noche" ? "noctámbulo" : "madrugador"} y el otro ${their === "Noche" ? "de noche" : "de día"}. Se van a cubrir las 24 horas.`,
+  },
+  prefer_netflix_fiesta: {
+    matchMsg: (v) => `Ambos prefieren ${v === "Netflix en casa" ? "una noche tranquila en casa" : "salir y vivir la fiesta"}. No habrá discusión los viernes.`,
+    diffMsg: (my, their) => `Uno prefiere ${my === "Netflix en casa" ? "quedarse en casa" : "salir de fiesta"} y el otro ${their === "Netflix en casa" ? "la tranquilidad del sofá" : "la rumba"}. Tendrán que negociar los fines de semana.`,
+  },
+  prefer_perdonar_justicia: {
+    matchMsg: (v) => `Coinciden en cómo manejan los errores: ${v === "Perdonar" ? "ambos perdonan con facilidad, lo cual es hermoso" : "ambos creen en las consecuencias, valoran la responsabilidad"}.`,
+    diffMsg: (my, their) => `Uno ${my === "Perdonar" ? "perdona fácilmente" : "cree en que se asuman las consecuencias"} y el otro ${their === "Perdonar" ? "prefiere perdonar" : "es más firme"}. Esa diferencia puede generar aprendizaje mutuo si hay comunicación.`,
+  },
+  prefer_hablar_espacio: {
+    matchMsg: (v) => `Los dos prefieren ${v === "Hablarlo ya" ? "enfrentar los problemas hablando de frente" : "tomarse un respiro antes de hablar"}. Eso evita muchos malentendidos.`,
+    diffMsg: (my, their) => `Cuando hay conflicto, uno ${my === "Hablarlo ya" ? "necesita hablarlo ya" : "necesita espacio"} y el otro ${their === "Hablarlo ya" ? "quiere resolverlo al instante" : "prefiere enfriarse primero"}. Respetar el ritmo del otro es clave aquí.`,
+  },
+  prefer_razon_corazon: {
+    matchMsg: (v) => `Ambos se guían por ${v === "La razón" ? "la lógica y la cabeza fría" : "lo que sienten, por el corazón"}. Toman decisiones de la misma forma.`,
+    diffMsg: (my, their) => `Uno se deja llevar por ${my === "La razón" ? "la razón" : "el corazón"} y el otro por ${their === "La razón" ? "la lógica" : "los sentimientos"}. Juntos pueden tomar decisiones más completas.`,
+  },
+  prefer_planificar_improvisar: {
+    matchMsg: (v) => `¡Los dos son de ${v === "Planificar" ? "planificar todo al detalle, el orden los une" : "improvisar y dejarse llevar, la espontaneidad es su fuerte"}!`,
+    diffMsg: (my, their) => `Uno ${my === "Planificar" ? "planifica cada paso" : "fluye con lo que venga"} y el otro ${their === "Planificar" ? "necesita estructura" : "improvisa sobre la marcha"}. El balance entre ambos puede ser perfecto.`,
+  },
+  prefer_pocas_muchas: {
+    matchMsg: (v) => `Coinciden: ${v === "Pocas profundas" ? "prefieren pocas amistades pero genuinas y profundas" : "les gusta rodearse de mucha gente y socializar"}.`,
+    diffMsg: (my, their) => `Uno ${my === "Pocas profundas" ? "prefiere un círculo pequeño y profundo" : "disfruta estar rodeado de gente"} y el otro ${their === "Pocas profundas" ? "es más selectivo con sus amistades" : "es más sociable"}. Pueden ampliar la perspectiva del otro.`,
+  },
+  prefer_feliz_razon: {
+    matchMsg: (v) => `Los dos eligen ${v === "Ser feliz" ? "ser felices antes que tener razón, eso habla de madurez emocional" : "defender lo que creen, valoran sus principios"}.`,
+    diffMsg: (my, their) => `Uno ${my === "Ser feliz" ? "prefiere soltar y ser feliz" : "defiende su posición"} y el otro ${their === "Ser feliz" ? "elige la paz" : "lucha por tener razón"}. Esa tensión puede enseñarles a encontrar el punto medio.`,
+  },
+  prefer_presente_futuro: {
+    matchMsg: (v) => `Ambos ${v === "Vivir el momento" ? "viven el presente y disfrutan el ahora" : "construyen pensando en el mañana"}. Comparten la misma visión del tiempo.`,
+    diffMsg: (my, their) => `Uno ${my === "Vivir el momento" ? "vive el momento" : "planifica el futuro"} y el otro ${their === "Vivir el momento" ? "disfruta el presente" : "piensa a largo plazo"}. Uno le enseña al otro a disfrutar hoy y a soñar con el mañana.`,
+  },
+  prefer_dar_recibir: {
+    matchMsg: (v) => `Los dos prefieren ${v === "Dar cariño" ? "dar cariño, son personas generosas con su amor" : "recibir cariño, necesitan sentirse amados"}. Se entienden en lo afectivo.`,
+    diffMsg: (my, their) => `Uno ${my === "Dar cariño" ? "ama dando" : "ama recibiendo"} y el otro ${their === "Dar cariño" ? "prefiere dar" : "necesita recibir"}. ${my !== their ? "¡Eso es perfecto! Uno da lo que el otro necesita." : ""}`,
+  },
+};
+
 function calculateCompatibility(myAnswers, partnerAnswers) {
   // Light questions (peso 1)
   const lightFields = [
-    { field: "prefer_dinero_amor", label: "Dinero vs Amor" },
-    { field: "prefer_playa_montana", label: "Playa vs Montaña" },
-    { field: "prefer_noche_dia", label: "Noche vs Día" },
-    { field: "prefer_netflix_fiesta", label: "Netflix vs Fiesta" },
+    "prefer_dinero_amor", "prefer_playa_montana", "prefer_noche_dia",
+    "prefer_netflix_fiesta",
   ];
 
   // Deep questions (peso 2 — valen el doble)
   const deepFields = [
-    { field: "prefer_perdonar_justicia", label: "Perdón vs Consecuencias" },
-    { field: "prefer_hablar_espacio", label: "Hablarlo vs Dar espacio" },
-    { field: "prefer_razon_corazon", label: "Razón vs Corazón" },
-    { field: "prefer_planificar_improvisar", label: "Planificar vs Improvisar" },
-    { field: "prefer_pocas_muchas", label: "Pocas amistades vs Muchas" },
-    { field: "prefer_feliz_razon", label: "Ser feliz vs Tener razón" },
-    { field: "prefer_presente_futuro", label: "Presente vs Futuro" },
-    { field: "prefer_dar_recibir", label: "Dar vs Recibir cariño" },
+    "prefer_perdonar_justicia", "prefer_hablar_espacio", "prefer_razon_corazon",
+    "prefer_planificar_improvisar", "prefer_pocas_muchas", "prefer_feliz_razon",
+    "prefer_presente_futuro", "prefer_dar_recibir",
   ];
 
   let totalPoints = 0;
@@ -473,65 +519,62 @@ function calculateCompatibility(myAnswers, partnerAnswers) {
   const matches = [];
   const diffs = [];
 
-  // Light (1 pt each)
-  lightFields.forEach(({ field, label }) => {
-    maxPoints += 1;
+  // Helper to process binary fields
+  function processBinary(field, weight) {
+    maxPoints += weight;
     const my = myAnswers[field];
     const their = partnerAnswers[field];
-    if (my && their) {
+    const insight = QUESTION_INSIGHTS[field];
+    if (my && their && insight) {
       if (my === their) {
-        totalPoints += 1;
-        matches.push({ icon: "✅", text: `Ambos prefieren ${my}` });
+        totalPoints += weight;
+        matches.push({ icon: weight > 1 ? "💕" : "✅", text: insight.matchMsg(my) });
       } else {
-        diffs.push({ icon: "💫", text: `${label}: Tú "${my}", tu pareja "${their}"` });
+        diffs.push({ icon: weight > 1 ? "✨" : "💫", text: insight.diffMsg(my, their) });
       }
     }
-  });
+  }
+
+  // Light (1 pt each)
+  lightFields.forEach((f) => processBinary(f, 1));
 
   // Deep (2 pts each)
-  deepFields.forEach(({ field, label }) => {
-    maxPoints += 2;
-    const my = myAnswers[field];
-    const their = partnerAnswers[field];
-    if (my && their) {
-      if (my === their) {
-        totalPoints += 2;
-        matches.push({ icon: "💕", text: `Ambos: "${my}"` });
-      } else {
-        diffs.push({ icon: "✨", text: `${label}: Tú "${my}", tu pareja "${their}"` });
-      }
-    }
-  });
+  deepFields.forEach((f) => processBinary(f, 2));
 
   // Color favorito (1 pt)
   maxPoints += 1;
   if (myAnswers.color_favorito && partnerAnswers.color_favorito) {
     if (myAnswers.color_favorito === partnerAnswers.color_favorito) {
       totalPoints += 1;
-      matches.push({ icon: "🎨", text: `¡Mismo color favorito: ${myAnswers.color_favorito}!` });
+      matches.push({ icon: "🎨", text: `¡Los dos aman el ${myAnswers.color_favorito}! Hasta en los colores conectan.` });
     } else {
-      diffs.push({ icon: "🎨", text: `Color: Tú ${myAnswers.color_favorito}, tu pareja ${partnerAnswers.color_favorito}` });
+      diffs.push({ icon: "🎨", text: `Tú vibras con el ${myAnswers.color_favorito} y tu pareja con el ${partnerAnswers.color_favorito}. Juntos hacen una paleta única.` });
     }
   }
 
   // Multi-select: valores_relacion (peso 2), musica_favorita (peso 1), algo_feliz (peso 1)
   const multiFields = [
-    { field: "valores_relacion", weight: 2, label: "Valores en relación" },
-    { field: "musica_favorita", weight: 1, label: "Música" },
-    { field: "algo_feliz", weight: 1, label: "Felicidad" },
+    { field: "valores_relacion", weight: 2, matchLabel: "Valoran lo mismo en una relación", diffLabel: "Valores en la relación" },
+    { field: "musica_favorita", weight: 1, matchLabel: "Comparten gusto musical", diffLabel: "Gustos musicales" },
+    { field: "algo_feliz", weight: 1, matchLabel: "Los hace felices lo mismo", diffLabel: "Fuentes de felicidad" },
   ];
 
-  multiFields.forEach(({ field, weight, label }) => {
+  multiFields.forEach(({ field, weight, matchLabel, diffLabel }) => {
     maxPoints += weight;
     const myList = Array.isArray(myAnswers[field]) ? myAnswers[field] : [];
     const theirList = Array.isArray(partnerAnswers[field]) ? partnerAnswers[field] : [];
     if (myList.length > 0 && theirList.length > 0) {
       const overlap = myList.filter((v) => theirList.includes(v));
+      const onlyMine = myList.filter((v) => !theirList.includes(v));
+      const onlyTheirs = theirList.filter((v) => !myList.includes(v));
       const maxLen = Math.max(myList.length, theirList.length);
       const score = maxLen > 0 ? (overlap.length / maxLen) * weight : 0;
       totalPoints += score;
       if (overlap.length > 0) {
-        matches.push({ icon: weight > 1 ? "💞" : "🎵", text: `${label}: coinciden en ${overlap.join(", ")}` });
+        matches.push({ icon: weight > 1 ? "💞" : "🎵", text: `${matchLabel}: ${overlap.join(", ")}` });
+      }
+      if (onlyMine.length > 0 && onlyTheirs.length > 0) {
+        diffs.push({ icon: "🌈", text: `${diffLabel}: Tú elegiste ${onlyMine.join(", ")} y tu pareja ${onlyTheirs.join(", ")}. Se pueden descubrir cosas nuevas.` });
       }
     }
   });
@@ -590,8 +633,11 @@ function showCompatibilityResult(partnerName, partnerRespuestas) {
     const myRespuestas = {};
     const fields = [
       "prefer_dinero_amor", "prefer_playa_montana", "prefer_noche_dia",
-      "prefer_netflix_fiesta", "prefer_perros_gatos", "prefer_llamada_mensaje",
-      "prefer_cafe_chocolate", "color_favorito", "musica_favorita", "algo_feliz"
+      "prefer_netflix_fiesta",
+      "prefer_perdonar_justicia", "prefer_hablar_espacio", "prefer_razon_corazon",
+      "prefer_planificar_improvisar", "prefer_pocas_muchas", "prefer_feliz_razon",
+      "prefer_presente_futuro", "prefer_dar_recibir",
+      "color_favorito", "valores_relacion", "musica_favorita", "algo_feliz"
     ];
     fields.forEach((f) => { if (answers[f] !== undefined) myRespuestas[f] = answers[f]; });
 
@@ -651,13 +697,13 @@ function showCompatibilityResult(partnerName, partnerRespuestas) {
   if (matches.length > 0) {
     matchesHTML += `<p class="result-matches-title">💕 En lo que coinciden</p>`;
     matches.forEach((m) => {
-      matchesHTML += `<div class="result-match-item match"><span class="result-match-icon">${m.icon}</span>${m.text}</div>`;
+      matchesHTML += `<div class="result-match-item match"><span class="result-item-icon">${m.icon}</span><span class="result-item-text">${m.text}</span></div>`;
     });
   }
   if (diffs.length > 0) {
-    matchesHTML += `<p class="result-matches-title" style="margin-top:16px;">✨ Sus diferencias</p>`;
+    matchesHTML += `<p class="result-matches-title" style="margin-top:20px;">✨ Sus diferencias</p>`;
     diffs.forEach((d) => {
-      matchesHTML += `<div class="result-match-item diff"><span class="result-match-icon">${d.icon}</span>${d.text}</div>`;
+      matchesHTML += `<div class="result-match-item diff"><span class="result-item-icon">${d.icon}</span><span class="result-item-text">${d.text}</span></div>`;
     });
   }
   matchesEl.innerHTML = matchesHTML;
