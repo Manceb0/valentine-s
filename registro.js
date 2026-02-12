@@ -2,10 +2,12 @@ const params = new URLSearchParams(window.location.search);
 let sujeto = params.get("sujeto") || "";
 let codigo = params.get("codigo") || "";
 
-const TOTAL_STEPS = 12; // steps 0-11
+const TOTAL_STEPS = 13; // steps 0-12
 let currentStep = -1;
 let answers = {};
 let registroId = null;
+let insertPromise = null;
+let resultShown = false;
 const needManualCode = !codigo || !sujeto;
 
 // DOM refs
@@ -28,6 +30,7 @@ function init() {
   initChipGroups();
   initPreferCards();
   initNombreStep();
+  initBirthdayStep();
   initNextChipsBtns();
 }
 
@@ -66,9 +69,9 @@ function showStep(step) {
 }
 
 function goNext() {
-  // After step 1 (gender) → INSERT to supabase
-  if (currentStep === 1) {
-    insertBasicInfo();
+  // After step 2 (birthday) → INSERT to supabase (store promise so we can await it later)
+  if (currentStep === 2) {
+    insertPromise = insertBasicInfo();
   }
 
   if (currentStep < TOTAL_STEPS - 1) {
@@ -136,6 +139,89 @@ function initNombreStep() {
         e.preventDefault();
         btn.click();
       }
+    });
+  }
+}
+
+// ————— ZODIAC CALCULATION —————
+const ZODIAC_DATA = [
+  { sign: "Capricornio", symbol: "♑", start: [1, 1], end: [1, 19] },
+  { sign: "Acuario", symbol: "♒", start: [1, 20], end: [2, 18] },
+  { sign: "Piscis", symbol: "♓", start: [2, 19], end: [3, 20] },
+  { sign: "Aries", symbol: "♈", start: [3, 21], end: [4, 19] },
+  { sign: "Tauro", symbol: "♉", start: [4, 20], end: [5, 20] },
+  { sign: "Géminis", symbol: "♊", start: [5, 21], end: [6, 20] },
+  { sign: "Cáncer", symbol: "♋", start: [6, 21], end: [7, 22] },
+  { sign: "Leo", symbol: "♌", start: [7, 23], end: [8, 22] },
+  { sign: "Virgo", symbol: "♍", start: [8, 23], end: [9, 22] },
+  { sign: "Libra", symbol: "♎", start: [9, 23], end: [10, 22] },
+  { sign: "Escorpio", symbol: "♏", start: [10, 23], end: [11, 21] },
+  { sign: "Sagitario", symbol: "♐", start: [11, 22], end: [12, 21] },
+  { sign: "Capricornio", symbol: "♑", start: [12, 22], end: [12, 31] },
+];
+
+function getZodiacSign(month, day) {
+  for (const z of ZODIAC_DATA) {
+    const [sm, sd] = z.start;
+    const [em, ed] = z.end;
+    const dateNum = month * 100 + day;
+    const startNum = sm * 100 + sd;
+    const endNum = em * 100 + ed;
+    if (dateNum >= startNum && dateNum <= endNum) {
+      return { sign: z.sign, symbol: z.symbol };
+    }
+  }
+  return { sign: "Capricornio", symbol: "♑" };
+}
+
+const GENDER_SYMBOLS = {
+  "Masculino": "♂",
+  "Femenino": "♀",
+  "Otro": "⚧",
+  "Prefiero no decir": "✦",
+};
+
+// ————— BIRTHDAY STEP —————
+function initBirthdayStep() {
+  const dateInput = document.getElementById("fecha_nacimiento");
+  const btn = document.getElementById("btn-birthday-next");
+  const revealEl = document.getElementById("zodiac-reveal");
+  const symbolEl = document.getElementById("zodiac-symbol");
+  const nameEl = document.getElementById("zodiac-name");
+
+  if (dateInput) {
+    dateInput.addEventListener("change", () => {
+      const val = dateInput.value;
+      if (!val) {
+        revealEl.style.display = "none";
+        return;
+      }
+      const parts = val.split("-");
+      const month = parseInt(parts[1]);
+      const day = parseInt(parts[2]);
+      const zodiac = getZodiacSign(month, day);
+
+      symbolEl.textContent = zodiac.symbol;
+      nameEl.textContent = zodiac.sign;
+      revealEl.style.display = "flex";
+      revealEl.style.animation = "none";
+      revealEl.offsetHeight;
+      revealEl.style.animation = "stepFadeIn 0.4s ease forwards";
+
+      answers.fecha_nacimiento = val;
+      answers.signo_zodiacal = zodiac.sign;
+      answers.signo_symbol = zodiac.symbol;
+    });
+  }
+
+  if (btn) {
+    btn.addEventListener("click", () => {
+      if (!answers.fecha_nacimiento) {
+        dateInput.style.borderColor = "#ff6b6b";
+        return;
+      }
+      dateInput.style.borderColor = "";
+      goNext();
     });
   }
 }
@@ -233,6 +319,8 @@ async function insertBasicInfo() {
         sujeto: sujeto,
         nombre: answers.nombre || "Anónimo",
         genero: answers.genero || null,
+        fecha_nacimiento: answers.fecha_nacimiento || null,
+        signo_zodiacal: answers.signo_zodiacal || null,
       })
       .select("id")
       .single();
@@ -256,9 +344,19 @@ async function submitAllAnswers() {
     supabase = mod.supabase;
   } catch (err) {
     console.warn("supabaseClient no disponible:", err);
-    // Offline mode: show result anyway with mock data
     showResultOffline();
     return;
+  }
+
+  // CRITICAL: Wait for the INSERT to finish before trying to UPDATE
+  if (insertPromise) {
+    await insertPromise;
+  }
+
+  // If INSERT still hasn't completed (race condition), retry
+  if (!registroId) {
+    console.warn("registroId aún no disponible, reintentando INSERT...");
+    await insertBasicInfo();
   }
 
   // Build respuestas object
@@ -279,6 +377,8 @@ async function submitAllAnswers() {
         .update({ respuestas })
         .eq("id", registroId);
       if (error) throw error;
+    } else {
+      console.error("No se pudo guardar: registroId no disponible");
     }
   } catch (err) {
     console.error("Error al guardar respuestas:", err);
@@ -453,6 +553,9 @@ function getCompatibilityText(percentage) {
 
 // ————— SHOW RESULT —————
 function showCompatibilityResult(partnerName, partnerRespuestas) {
+  if (resultShown) return; // Prevent duplicate calls from polling + realtime
+  resultShown = true;
+
   waitingScreen.style.display = "none";
   resultScreen.style.display = "flex";
 

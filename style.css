@@ -558,6 +558,15 @@ body {
   line-height: 1.2;
 }
 
+.player-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
 .players-screen .genero-registrado {
   display: inline-block;
   font-family: Arial, sans-serif;
@@ -568,7 +577,18 @@ body {
   border-radius: 20px;
   padding: 5px 16px;
   letter-spacing: 0.5px;
-  margin-bottom: 14px;
+}
+
+.players-screen .signo-registrado {
+  display: inline-block;
+  font-family: Arial, sans-serif;
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(138, 79, 255, 0.18);
+  border: 1px solid rgba(138, 79, 255, 0.35);
+  border-radius: 20px;
+  padding: 5px 16px;
+  letter-spacing: 0.5px;
 }
 
 .players-screen .btn-resetear-sujeto {
@@ -593,8 +613,17 @@ body {
   color: #fff;
 }
 
+.players-bottom-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
 .players-screen .btn-volver-qr {
-  margin-top: 24px;
+  margin-top: 0;
   padding: 12px 32px;
   font-size: 0.9em;
   border: 2px solid #ff69b4;
@@ -611,6 +640,28 @@ body {
 .players-screen .btn-volver-qr:hover {
   background: rgba(255, 105, 180, 0.25);
   box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-nueva-pareja {
+  padding: 12px 32px;
+  font-size: 0.9em;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: Arial, sans-serif;
+}
+
+.btn-nueva-pareja:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
@@ -1212,6 +1263,37 @@ body {
   margin-top: 20px;
 }
 
+/* Date input */
+.quiz-input-date {
+  color-scheme: dark;
+}
+
+/* Zodiac reveal in quiz */
+.zodiac-reveal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0 4px;
+  padding: 14px 24px;
+  background: rgba(255, 105, 180, 0.12);
+  border: 1.5px solid rgba(255, 105, 180, 0.3);
+  border-radius: 20px;
+}
+
+.zodiac-reveal-symbol {
+  font-size: 2.2em;
+  line-height: 1;
+  filter: drop-shadow(0 0 8px rgba(255, 105, 180, 0.5));
+}
+
+.zodiac-reveal-name {
+  font-family: "Great Vibes", cursive;
+  font-size: 1.5em;
+  color: #ff69b4;
+  text-shadow: 0 0 10px rgba(255, 105, 180, 0.4);
+}
+
 /* Prefer cards (VS questions) */
 .prefer-options {
   display: flex;
@@ -1506,4 +1588,10 @@ body {
 .result-match-icon {
   font-size: 1.2em;
   flex-shrink: 0;
+}
+
+.result-restart-btn {
+  margin-top: 30px;
+  width: 100%;
+  max-width: 280px;
 }

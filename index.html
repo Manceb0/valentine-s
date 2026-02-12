@@ -110,7 +110,10 @@
         <div class="qr-wrap" id="qr-a-wrap"><canvas id="qrcode-sujeto-a"></canvas></div>
         <div class="nombre-wrap" id="nombre-a-wrap" style="display: none;">
           <span class="nombre-registrado" id="nombre-a-display"></span>
-          <span class="genero-registrado" id="genero-a-display"></span>
+          <div class="player-badges">
+            <span class="genero-registrado" id="genero-a-display"></span>
+            <span class="signo-registrado" id="signo-a-display" style="display:none;"></span>
+          </div>
           <button type="button" class="btn-resetear-sujeto" id="resetear-a" aria-label="Resetear Corazón 1">Resetear</button>
         </div>
         <p class="qr-legend" id="legend-a">Escanea para registrarte como Corazón 1</p>
@@ -120,14 +123,20 @@
         <div class="qr-wrap" id="qr-b-wrap"><canvas id="qrcode-sujeto-b"></canvas></div>
         <div class="nombre-wrap" id="nombre-b-wrap" style="display: none;">
           <span class="nombre-registrado" id="nombre-b-display"></span>
-          <span class="genero-registrado" id="genero-b-display"></span>
+          <div class="player-badges">
+            <span class="genero-registrado" id="genero-b-display"></span>
+            <span class="signo-registrado" id="signo-b-display" style="display:none;"></span>
+          </div>
           <button type="button" class="btn-resetear-sujeto" id="resetear-b" aria-label="Resetear Corazón 2">Resetear</button>
         </div>
         <p class="qr-legend" id="legend-b">Escanea para registrarte como Corazón 2</p>
       </div>
     </div>
     <p class="players-codigo" id="codigo-par-display">Código de pareja: <strong id="codigo-par-val"></strong></p>
-    <button type="button" class="btn-volver-qr" id="btn-volver-qr" style="display: none;">Ver códigos QR</button>
+    <div class="players-bottom-buttons">
+      <button type="button" class="btn-volver-qr" id="btn-volver-qr" style="display: none;">Ver códigos QR</button>
+      <button type="button" class="btn-nueva-pareja" id="btn-nueva-pareja" style="display: none;">Nueva pareja ↩</button>
+    </div>
   </div>
 
   <div class="scene">

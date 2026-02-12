@@ -47,8 +47,19 @@
       </div>
     </div>
 
-    <!-- 2: Dinero vs Amor -->
+    <!-- 2: Fecha de nacimiento -->
     <div class="quiz-step" data-step="2">
+      <h2 class="quiz-question">¿Cuándo naciste? 🎂</h2>
+      <input type="date" id="fecha_nacimiento" class="quiz-input quiz-input-date">
+      <div class="zodiac-reveal" id="zodiac-reveal" style="display:none;">
+        <span class="zodiac-reveal-symbol" id="zodiac-symbol"></span>
+        <span class="zodiac-reveal-name" id="zodiac-name"></span>
+      </div>
+      <button type="button" class="quiz-next-btn" id="btn-birthday-next">Siguiente →</button>
+    </div>
+
+    <!-- 3: Dinero vs Amor -->
+    <div class="quiz-step" data-step="3">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_dinero_amor">
         <button type="button" class="prefer-card" data-value="Dinero">💰<span>Dinero</span></button>
@@ -57,8 +68,8 @@
       </div>
     </div>
 
-    <!-- 3: Playa vs Montaña -->
-    <div class="quiz-step" data-step="3">
+    <!-- 4: Playa vs Montaña -->
+    <div class="quiz-step" data-step="4">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_playa_montana">
         <button type="button" class="prefer-card" data-value="Playa">🏖️<span>Playa</span></button>
@@ -67,8 +78,8 @@
       </div>
     </div>
 
-    <!-- 4: Noche vs Día -->
-    <div class="quiz-step" data-step="4">
+    <!-- 5: Noche vs Día -->
+    <div class="quiz-step" data-step="5">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_noche_dia">
         <button type="button" class="prefer-card" data-value="Noche">🌙<span>Noche</span></button>
@@ -77,8 +88,8 @@
       </div>
     </div>
 
-    <!-- 5: Netflix vs Salir -->
-    <div class="quiz-step" data-step="5">
+    <!-- 6: Netflix vs Salir -->
+    <div class="quiz-step" data-step="6">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_netflix_fiesta">
         <button type="button" class="prefer-card" data-value="Netflix en casa">🎬<span>Netflix en casa</span></button>
@@ -87,8 +98,8 @@
       </div>
     </div>
 
-    <!-- 6: Perros vs Gatos -->
-    <div class="quiz-step" data-step="6">
+    <!-- 7: Perros vs Gatos -->
+    <div class="quiz-step" data-step="7">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_perros_gatos">
         <button type="button" class="prefer-card" data-value="Perros">🐶<span>Perros</span></button>
@@ -97,8 +108,8 @@
       </div>
     </div>
 
-    <!-- 7: Llamada vs Mensaje -->
-    <div class="quiz-step" data-step="7">
+    <!-- 8: Llamada vs Mensaje -->
+    <div class="quiz-step" data-step="8">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_llamada_mensaje">
         <button type="button" class="prefer-card" data-value="Llamada">📞<span>Llamada</span></button>
@@ -107,8 +118,8 @@
       </div>
     </div>
 
-    <!-- 8: Café vs Chocolate -->
-    <div class="quiz-step" data-step="8">
+    <!-- 9: Café vs Chocolate -->
+    <div class="quiz-step" data-step="9">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_cafe_chocolate">
         <button type="button" class="prefer-card" data-value="Café">☕<span>Café</span></button>
@@ -117,8 +128,8 @@
       </div>
     </div>
 
-    <!-- 9: Color favorito -->
-    <div class="quiz-step" data-step="9">
+    <!-- 10: Color favorito -->
+    <div class="quiz-step" data-step="10">
       <h2 class="quiz-question">Tu color favorito 🎨</h2>
       <div class="chip-group" data-field="color_favorito" data-max="1" data-auto="true">
         <button type="button" class="chip chip-color" data-value="Rojo"><span class="chip-dot" style="background:#e74c3c"></span>Rojo</button>
@@ -133,8 +144,8 @@
       </div>
     </div>
 
-    <!-- 10: Música favorita (multi) -->
-    <div class="quiz-step" data-step="10">
+    <!-- 11: Música favorita (multi) -->
+    <div class="quiz-step" data-step="11">
       <h2 class="quiz-question">Música favorita 🎵</h2>
       <p class="quiz-sub">Elige hasta 3</p>
       <div class="chip-group" data-field="musica_favorita" data-max="3">
@@ -153,8 +164,8 @@
       <button type="button" class="quiz-next-btn quiz-next-chips">Siguiente →</button>
     </div>
 
-    <!-- 11: ¿Qué te hace feliz? (multi) -->
-    <div class="quiz-step" data-step="11">
+    <!-- 12: ¿Qué te hace feliz? (multi) -->
+    <div class="quiz-step" data-step="12">
       <h2 class="quiz-question">¿Qué te hace feliz? 😊</h2>
       <p class="quiz-sub">Elige hasta 3</p>
       <div class="chip-group" data-field="algo_feliz" data-max="3">
@@ -201,6 +212,7 @@
       <h3 class="result-label" id="result-label"></h3>
       <p class="result-justification" id="result-justification"></p>
       <div class="result-matches" id="result-matches"></div>
+      <button type="button" class="quiz-next-btn result-restart-btn" id="btn-restart" onclick="window.location.reload()">Volver al inicio ↩</button>
     </div>
   </div>
 

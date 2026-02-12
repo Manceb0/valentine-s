@@ -656,17 +656,43 @@ let codigoParActual = null;
 let sujetoAId = null;
 let sujetoBId = null;
 let mostrandoNombres = true;
-let lastParticipantA = { nombre: null, genero: null };
-let lastParticipantB = { nombre: null, genero: null };
+let lastParticipantA = { nombre: null, genero: null, signo: null };
+let lastParticipantB = { nombre: null, genero: null, signo: null };
 
-function showNombreEnPantalla(sujeto, nombre, genero) {
+const GENDER_SYMBOLS = {
+  "Masculino": "♂",
+  "Femenino": "♀",
+  "Otro": "⚧",
+  "Prefiero no decir": "✦",
+};
+
+const ZODIAC_SYMBOLS = {
+  "Aries": "♈", "Tauro": "♉", "Géminis": "♊", "Cáncer": "♋",
+  "Leo": "♌", "Virgo": "♍", "Libra": "♎", "Escorpio": "♏",
+  "Sagitario": "♐", "Capricornio": "♑", "Acuario": "♒", "Piscis": "♓",
+};
+
+function formatGeneroWithSymbol(genero) {
+  if (!genero) return "";
+  const symbol = GENDER_SYMBOLS[genero] || "";
+  return symbol ? `${symbol} ${genero}` : genero;
+}
+
+function formatSignoWithSymbol(signo) {
+  if (!signo) return "";
+  const symbol = ZODIAC_SYMBOLS[signo] || "";
+  return symbol ? `${symbol} ${signo}` : signo;
+}
+
+function showNombreEnPantalla(sujeto, nombre, genero, signo) {
   const s = String(sujeto).toUpperCase();
   if (s === "A") {
-    lastParticipantA = { nombre: nombre || null, genero: genero || null };
+    lastParticipantA = { nombre: nombre || null, genero: genero || null, signo: signo || null };
     const qrWrap = document.getElementById("qr-a-wrap");
     const nombreWrap = document.getElementById("nombre-a-wrap");
     const display = document.getElementById("nombre-a-display");
     const generoDisplay = document.getElementById("genero-a-display");
+    const signoDisplay = document.getElementById("signo-a-display");
     const legend = document.getElementById("legend-a");
     if (mostrandoNombres) {
       if (qrWrap) qrWrap.style.display = "none";
@@ -674,16 +700,21 @@ function showNombreEnPantalla(sujeto, nombre, genero) {
       if (nombreWrap) nombreWrap.style.display = "block";
       if (display) display.textContent = nombre || "Corazón 1";
       if (generoDisplay) {
-        generoDisplay.textContent = genero || "";
+        generoDisplay.textContent = formatGeneroWithSymbol(genero);
         generoDisplay.style.display = genero ? "inline-block" : "none";
+      }
+      if (signoDisplay) {
+        signoDisplay.textContent = formatSignoWithSymbol(signo);
+        signoDisplay.style.display = signo ? "inline-block" : "none";
       }
     }
   } else if (s === "B") {
-    lastParticipantB = { nombre: nombre || null, genero: genero || null };
+    lastParticipantB = { nombre: nombre || null, genero: genero || null, signo: signo || null };
     const qrWrap = document.getElementById("qr-b-wrap");
     const nombreWrap = document.getElementById("nombre-b-wrap");
     const display = document.getElementById("nombre-b-display");
     const generoDisplay = document.getElementById("genero-b-display");
+    const signoDisplay = document.getElementById("signo-b-display");
     const legend = document.getElementById("legend-b");
     if (mostrandoNombres) {
       if (qrWrap) qrWrap.style.display = "none";
@@ -691,8 +722,12 @@ function showNombreEnPantalla(sujeto, nombre, genero) {
       if (nombreWrap) nombreWrap.style.display = "block";
       if (display) display.textContent = nombre || "Corazón 2";
       if (generoDisplay) {
-        generoDisplay.textContent = genero || "";
+        generoDisplay.textContent = formatGeneroWithSymbol(genero);
         generoDisplay.style.display = genero ? "inline-block" : "none";
+      }
+      if (signoDisplay) {
+        signoDisplay.textContent = formatSignoWithSymbol(signo);
+        signoDisplay.style.display = signo ? "inline-block" : "none";
       }
     }
   }
@@ -724,19 +759,29 @@ function setVistaQR(mostrarQR) {
     if (sujetoAId) {
       const d = document.getElementById("nombre-a-display");
       const g = document.getElementById("genero-a-display");
+      const z = document.getElementById("signo-a-display");
       if (d) d.textContent = lastParticipantA.nombre || "Corazón 1";
       if (g) {
-        g.textContent = lastParticipantA.genero || "";
+        g.textContent = formatGeneroWithSymbol(lastParticipantA.genero);
         g.style.display = lastParticipantA.genero ? "inline-block" : "none";
+      }
+      if (z) {
+        z.textContent = formatSignoWithSymbol(lastParticipantA.signo);
+        z.style.display = lastParticipantA.signo ? "inline-block" : "none";
       }
     }
     if (sujetoBId) {
       const d = document.getElementById("nombre-b-display");
       const g = document.getElementById("genero-b-display");
+      const z = document.getElementById("signo-b-display");
       if (d) d.textContent = lastParticipantB.nombre || "Corazón 2";
       if (g) {
-        g.textContent = lastParticipantB.genero || "";
+        g.textContent = formatGeneroWithSymbol(lastParticipantB.genero);
         g.style.display = lastParticipantB.genero ? "inline-block" : "none";
+      }
+      if (z) {
+        z.textContent = formatSignoWithSymbol(lastParticipantB.signo);
+        z.style.display = lastParticipantB.signo ? "inline-block" : "none";
       }
     }
   }
@@ -748,12 +793,18 @@ function setVistaQR(mostrarQR) {
 
 function updateVolverQrButton() {
   const btn = document.getElementById("btn-volver-qr");
-  if (!btn) return;
-  if (sujetoAId || sujetoBId) {
-    btn.style.display = "block";
-    btn.textContent = mostrandoNombres ? "Ver códigos QR" : "Ver participantes";
-  } else {
-    btn.style.display = "none";
+  if (btn) {
+    if (sujetoAId || sujetoBId) {
+      btn.style.display = "block";
+      btn.textContent = mostrandoNombres ? "Ver códigos QR" : "Ver participantes";
+    } else {
+      btn.style.display = "none";
+    }
+  }
+  // Show "Nueva pareja" button when both are registered
+  const btnNueva = document.getElementById("btn-nueva-pareja");
+  if (btnNueva) {
+    btnNueva.style.display = (sujetoAId && sujetoBId) ? "block" : "none";
   }
 }
 
@@ -791,13 +842,13 @@ async function initPlayersScreenRealtime() {
 
   const { data: existing } = await supabase
     .from("participantes_valentine")
-    .select("id, nombre, genero, sujeto")
+    .select("id, nombre, genero, signo_zodiacal, sujeto")
     .eq("codigo_par", codigoParActual);
 
   (existing || []).forEach((row) => {
     if (row.sujeto === "A") sujetoAId = row.id;
     if (row.sujeto === "B") sujetoBId = row.id;
-    showNombreEnPantalla(row.sujeto, row.nombre, row.genero);
+    showNombreEnPantalla(row.sujeto, row.nombre, row.genero, row.signo_zodiacal);
   });
 
   supabase
@@ -810,7 +861,7 @@ async function initPlayersScreenRealtime() {
         if (row.codigo_par !== codigoParActual) return;
         if (row.sujeto === "A") sujetoAId = row.id;
         if (row.sujeto === "B") sujetoBId = row.id;
-        showNombreEnPantalla(row.sujeto, row.nombre, row.genero);
+        showNombreEnPantalla(row.sujeto, row.nombre, row.genero, row.signo_zodiacal);
       }
     )
     .on(
@@ -819,8 +870,8 @@ async function initPlayersScreenRealtime() {
       (payload) => {
         const row = payload.new;
         if (row.codigo_par !== codigoParActual) return;
-        if (row.sujeto === "A") showNombreEnPantalla("A", row.nombre, row.genero);
-        if (row.sujeto === "B") showNombreEnPantalla("B", row.nombre, row.genero);
+        if (row.sujeto === "A") showNombreEnPantalla("A", row.nombre, row.genero, row.signo_zodiacal);
+        if (row.sujeto === "B") showNombreEnPantalla("B", row.nombre, row.genero, row.signo_zodiacal);
       }
     )
     .on(
@@ -856,6 +907,11 @@ async function initPlayersScreenRealtime() {
     } catch (e) {
       console.error("Error al resetear Corazón 2:", e);
     }
+  });
+
+  document.getElementById("btn-nueva-pareja")?.addEventListener("click", () => {
+    // Reset everything and restart with a new code
+    launchExperience();
   });
 }
 
