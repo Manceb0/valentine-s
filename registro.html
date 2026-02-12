@@ -11,72 +11,84 @@
   <div id="registro-form-container" class="registro-container">
     <h1 class="registro-title">Regístrate</h1>
     <p class="registro-subtitle">Valentine's — Amorous Symphony</p>
-    <form id="form-registro" class="form-registro">
-      <div class="form-group" id="grupo-codigo" style="display: none;">
-        <label for="codigo_manual">Código de pareja</label>
-        <input type="text" id="codigo_manual" name="codigo_manual" placeholder="Ej: A7F3K2" maxlength="6" style="text-transform: uppercase;">
-      </div>
-      <div class="form-group" id="grupo-sujeto-manual" style="display: none;">
-        <label for="sujeto_manual">Eres Sujeto</label>
-        <select id="sujeto_manual" name="sujeto_manual">
-          <option value="A">Sujeto A</option>
-          <option value="B">Sujeto B</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" maxlength="100">
-      </div>
-      <div class="form-group">
-        <label for="fecha_nacimiento">Fecha de nacimiento</label>
-        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-      </div>
-      <div class="form-group">
-        <label for="carrera">Carrera</label>
-        <select id="carrera" name="carrera" required>
-          <option value="">Selecciona una carrera</option>
-          <option value="Ingeniería">Ingeniería</option>
-          <option value="Medicina">Medicina</option>
-          <option value="Derecho">Derecho</option>
-          <option value="Administración">Administración</option>
-          <option value="Arquitectura">Arquitectura</option>
-          <option value="Psicología">Psicología</option>
-          <option value="Comunicación">Comunicación</option>
-          <option value="Diseño">Diseño</option>
-          <option value="Otra">Otra</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="genero">Género</label>
-        <select id="genero" name="genero" required>
-          <option value="">Selecciona</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Femenino">Femenino</option>
-          <option value="Otro">Otro</option>
-          <option value="Prefiero no decir">Prefiero no decir</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="signo_zodiacal">Signo zodiacal</label>
-        <select id="signo_zodiacal" name="signo_zodiacal">
-          <option value="">Selecciona tu signo</option>
-          <option value="Aries">Aries</option>
-          <option value="Tauro">Tauro</option>
-          <option value="Géminis">Géminis</option>
-          <option value="Cáncer">Cáncer</option>
-          <option value="Leo">Leo</option>
-          <option value="Virgo">Virgo</option>
-          <option value="Libra">Libra</option>
-          <option value="Escorpio">Escorpio</option>
-          <option value="Sagitario">Sagitario</option>
-          <option value="Capricornio">Capricornio</option>
-          <option value="Acuario">Acuario</option>
-          <option value="Piscis">Piscis</option>
-        </select>
-      </div>
-      <button type="submit" class="registro-submit" id="btn-enviar">Enviar</button>
-      <p id="registro-error" class="registro-error" style="display: none;"></p>
-    </form>
+
+    <!-- Paso 1: solo nombre -->
+    <div id="paso-1" class="registro-paso">
+      <form id="form-paso-1" class="form-registro">
+        <div class="form-group" id="grupo-codigo" style="display: none;">
+          <label for="codigo_manual">Código de pareja</label>
+          <input type="text" id="codigo_manual" name="codigo_manual" placeholder="Ej: A7F3K2" maxlength="6" style="text-transform: uppercase;">
+        </div>
+        <div class="form-group" id="grupo-sujeto-manual" style="display: none;">
+          <label for="sujeto_manual">Eres Sujeto</label>
+          <select id="sujeto_manual" name="sujeto_manual">
+            <option value="A">Sujeto A</option>
+            <option value="B">Sujeto B</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" maxlength="100">
+        </div>
+        <button type="submit" class="registro-submit" id="btn-confirmar">Confirmar</button>
+        <p id="registro-error" class="registro-error" style="display: none;"></p>
+      </form>
+    </div>
+
+    <!-- Paso 2: resto del formulario -->
+    <div id="paso-2" class="registro-paso" style="display: none;">
+      <form id="form-paso-2" class="form-registro">
+        <div class="form-group">
+          <label for="fecha_nacimiento">Fecha de nacimiento</label>
+          <input type="date" id="fecha_nacimiento" name="fecha_nacimiento">
+        </div>
+        <div class="form-group">
+          <label for="carrera">Carrera</label>
+          <select id="carrera" name="carrera">
+            <option value="">Selecciona una carrera</option>
+            <option value="Ingeniería">Ingeniería</option>
+            <option value="Medicina">Medicina</option>
+            <option value="Derecho">Derecho</option>
+            <option value="Administración">Administración</option>
+            <option value="Arquitectura">Arquitectura</option>
+            <option value="Psicología">Psicología</option>
+            <option value="Comunicación">Comunicación</option>
+            <option value="Diseño">Diseño</option>
+            <option value="Otra">Otra</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="genero">Género</label>
+          <select id="genero" name="genero">
+            <option value="">Selecciona</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+            <option value="Prefiero no decir">Prefiero no decir</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="signo_zodiacal">Signo zodiacal</label>
+          <select id="signo_zodiacal" name="signo_zodiacal">
+            <option value="">Selecciona tu signo</option>
+            <option value="Aries">Aries</option>
+            <option value="Tauro">Tauro</option>
+            <option value="Géminis">Géminis</option>
+            <option value="Cáncer">Cáncer</option>
+            <option value="Leo">Leo</option>
+            <option value="Virgo">Virgo</option>
+            <option value="Libra">Libra</option>
+            <option value="Escorpio">Escorpio</option>
+            <option value="Sagitario">Sagitario</option>
+            <option value="Capricornio">Capricornio</option>
+            <option value="Acuario">Acuario</option>
+            <option value="Piscis">Piscis</option>
+          </select>
+        </div>
+        <button type="submit" class="registro-submit" id="btn-enviar">Enviar</button>
+        <p id="registro-error-2" class="registro-error" style="display: none;"></p>
+      </form>
+    </div>
   </div>
   <div id="registro-success" class="registro-success" style="display: none;">
     <div class="success-content">

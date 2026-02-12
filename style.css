@@ -514,6 +514,35 @@ body {
   text-align: center;
 }
 
+.players-screen .nombre-wrap {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.players-screen .nombre-registrado {
+  display: block;
+  font-size: 1.2em;
+  color: #ff69b4;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+  margin-bottom: 8px;
+}
+
+.players-screen .btn-resetear-sujeto {
+  background: transparent;
+  border: 1px solid rgba(255, 105, 180, 0.6);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 6px 14px;
+  font-size: 0.85em;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.players-screen .btn-resetear-sujeto:hover {
+  background: rgba(255, 105, 180, 0.2);
+}
+
 .players-codigo {
   margin-top: 24px;
   font-size: 1.1em;

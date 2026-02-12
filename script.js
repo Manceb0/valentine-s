@@ -653,10 +653,124 @@ window.addEventListener("resize", () => {
 });
 
 let codigoParActual = null;
+let sujetoAId = null;
+let sujetoBId = null;
+
+function showNombreEnPantalla(sujeto, nombre) {
+  const s = String(sujeto).toUpperCase();
+  if (s === "A") {
+    const qrWrap = document.getElementById("qr-a-wrap");
+    const nombreWrap = document.getElementById("nombre-a-wrap");
+    const display = document.getElementById("nombre-a-display");
+    const legend = document.getElementById("legend-a");
+    if (qrWrap) qrWrap.style.display = "none";
+    if (legend) legend.style.display = "none";
+    if (nombreWrap) nombreWrap.style.display = "block";
+    if (display) display.textContent = nombre || "Sujeto A";
+  } else if (s === "B") {
+    const qrWrap = document.getElementById("qr-b-wrap");
+    const nombreWrap = document.getElementById("nombre-b-wrap");
+    const display = document.getElementById("nombre-b-display");
+    const legend = document.getElementById("legend-b");
+    if (qrWrap) qrWrap.style.display = "none";
+    if (legend) legend.style.display = "none";
+    if (nombreWrap) nombreWrap.style.display = "block";
+    if (display) display.textContent = nombre || "Sujeto B";
+  }
+}
+
+function showQREnPantalla(sujeto) {
+  const s = String(sujeto).toUpperCase();
+  if (s === "A") {
+    const qrWrap = document.getElementById("qr-a-wrap");
+    const nombreWrap = document.getElementById("nombre-a-wrap");
+    const legend = document.getElementById("legend-a");
+    if (qrWrap) qrWrap.style.display = "block";
+    if (nombreWrap) nombreWrap.style.display = "none";
+    if (legend) legend.style.display = "block";
+    sujetoAId = null;
+  } else if (s === "B") {
+    const qrWrap = document.getElementById("qr-b-wrap");
+    const nombreWrap = document.getElementById("nombre-b-wrap");
+    const legend = document.getElementById("legend-b");
+    if (qrWrap) qrWrap.style.display = "block";
+    if (nombreWrap) nombreWrap.style.display = "none";
+    if (legend) legend.style.display = "block";
+    sujetoBId = null;
+  }
+}
+
+async function initPlayersScreenRealtime() {
+  if (!codigoParActual) return;
+  let supabase;
+  try {
+    const mod = await import("./supabaseClient.js");
+    supabase = mod.supabase;
+  } catch (e) {
+    console.warn("supabaseClient no disponible para pantalla de jugadores:", e);
+    return;
+  }
+
+  const { data: existing } = await supabase
+    .from("participantes_valentine")
+    .select("id, nombre, sujeto")
+    .eq("codigo_par", codigoParActual);
+
+  (existing || []).forEach((row) => {
+    if (row.sujeto === "A") sujetoAId = row.id;
+    if (row.sujeto === "B") sujetoBId = row.id;
+    showNombreEnPantalla(row.sujeto, row.nombre);
+  });
+
+  supabase
+    .channel("players-screen-" + codigoParActual)
+    .on(
+      "postgres_changes",
+      { event: "INSERT", schema: "public", table: "participantes_valentine" },
+      (payload) => {
+        const row = payload.new;
+        if (row.codigo_par !== codigoParActual) return;
+        if (row.sujeto === "A") sujetoAId = row.id;
+        if (row.sujeto === "B") sujetoBId = row.id;
+        showNombreEnPantalla(row.sujeto, row.nombre);
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "DELETE", schema: "public", table: "participantes_valentine" },
+      (payload) => {
+        const row = payload.old;
+        if (row.codigo_par !== codigoParActual) return;
+        showQREnPantalla(row.sujeto);
+      }
+    )
+    .subscribe();
+
+  document.getElementById("resetear-a")?.addEventListener("click", async () => {
+    if (!sujetoAId) return;
+    try {
+      const mod = await import("./supabaseClient.js");
+      await mod.supabase.from("participantes_valentine").delete().eq("id", sujetoAId);
+    } catch (e) {
+      console.error("Error al resetear Sujeto A:", e);
+    }
+  });
+  document.getElementById("resetear-b")?.addEventListener("click", async () => {
+    if (!sujetoBId) return;
+    try {
+      const mod = await import("./supabaseClient.js");
+      await mod.supabase.from("participantes_valentine").delete().eq("id", sujetoBId);
+    } catch (e) {
+      console.error("Error al resetear Sujeto B:", e);
+    }
+  });
+}
 
 function launchExperience() {
   codigoParActual = generarCodigoPar();
   window.codigoPar = codigoParActual;
+  sujetoAId = null;
+  sujetoBId = null;
 
   document.querySelector(".start-screen").style.opacity = "0";
   setTimeout(() => {
@@ -667,7 +781,10 @@ function launchExperience() {
       ps.classList.add("visible");
       const codigoEl = document.getElementById("codigo-par-val");
       if (codigoEl) codigoEl.textContent = codigoParActual;
+      showQREnPantalla("A");
+      showQREnPantalla("B");
       renderPlayersQR();
+      initPlayersScreenRealtime();
     }
   }, 500);
 }
