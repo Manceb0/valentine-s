@@ -510,9 +510,7 @@ function calculateCompatibility(myAnswers, partnerAnswers) {
   });
 
   const rawPercent = maxPoints > 0 ? (totalPoints / maxPoints) * 100 : 50;
-  // Add a small chemistry bonus (5-12%) so scores feel good
-  const chemistryBonus = 5 + Math.random() * 7;
-  const percentage = Math.min(99, Math.round(rawPercent + chemistryBonus));
+  const percentage = Math.min(99, Math.max(5, Math.round(rawPercent)));
 
   return { percentage, matches, diffs };
 }
@@ -577,7 +575,7 @@ function showCompatibilityResult(partnerName, partnerRespuestas) {
     compatText = getCompatibilityText(percentage);
   } else {
     // No partner yet — show a generic message
-    percentage = Math.floor(50 + Math.random() * 30);
+    percentage = 0;
     matches = [];
     diffs = [];
     compatText = {
@@ -644,8 +642,11 @@ function showResultOffline() {
   container.style.display = "none";
   resultScreen.style.display = "flex";
 
-  const percentage = Math.floor(55 + Math.random() * 35);
-  const compatText = getCompatibilityText(percentage);
+  const percentage = 0;
+  const compatText = {
+    label: "Sin conexión",
+    text: "No se pudo calcular la compatibilidad. Conecta a internet y vuelve a intentarlo."
+  };
 
   const percentEl = document.getElementById("result-percentage");
   const circleFill = document.getElementById("result-circle-fill");

@@ -132,6 +132,29 @@
         <p class="qr-legend" id="legend-b">Escanea para registrarte como Corazón 2</p>
       </div>
     </div>
+    <!-- Estado del quiz y resultado de compatibilidad -->
+    <div class="match-area" id="match-area" style="display:none;">
+      <!-- En proceso -->
+      <div class="match-in-progress" id="match-in-progress">
+        <span class="match-pulse-icon">💕</span>
+        <span class="match-status-text">Completando quiz...</span>
+      </div>
+      <!-- Resultado -->
+      <div class="match-result" id="match-result" style="display:none;">
+        <div class="match-circle-wrap">
+          <svg class="match-circle-svg" viewBox="0 0 120 120">
+            <circle class="match-circle-bg" cx="60" cy="60" r="54" />
+            <circle class="match-circle-fill" id="match-circle-fill" cx="60" cy="60" r="54" />
+          </svg>
+          <div class="match-pct-inner">
+            <span class="match-pct-num" id="match-pct-num">0</span><span class="match-pct-sign">%</span>
+          </div>
+        </div>
+        <h3 class="match-label" id="match-label"></h3>
+        <p class="match-text" id="match-text"></p>
+      </div>
+    </div>
+
     <p class="players-codigo" id="codigo-par-display">Código de pareja: <strong id="codigo-par-val"></strong></p>
     <div class="players-bottom-buttons">
       <button type="button" class="btn-volver-qr" id="btn-volver-qr" style="display: none;">Ver códigos QR</button>

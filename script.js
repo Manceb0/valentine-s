@@ -658,6 +658,9 @@ let sujetoBId = null;
 let mostrandoNombres = true;
 let lastParticipantA = { nombre: null, genero: null, signo: null };
 let lastParticipantB = { nombre: null, genero: null, signo: null };
+let respuestasA = null;
+let respuestasB = null;
+let mainResultShown = false;
 
 const GENDER_SYMBOLS = {
   "Masculino": "♂",
@@ -732,6 +735,7 @@ function showNombreEnPantalla(sujeto, nombre, genero, signo) {
     }
   }
   updateVolverQrButton();
+  updateMatchArea();
 }
 
 function setVistaQR(mostrarQR) {
@@ -808,6 +812,125 @@ function updateVolverQrButton() {
   }
 }
 
+// ————— MATCH AREA: Estado y resultado en pantalla principal —————
+function updateMatchArea() {
+  const area = document.getElementById("match-area");
+  if (!area) return;
+
+  // Show area only when at least one player is registered
+  if (!sujetoAId && !sujetoBId) {
+    area.style.display = "none";
+    return;
+  }
+
+  area.style.display = "flex";
+  const inProgress = document.getElementById("match-in-progress");
+  const resultEl = document.getElementById("match-result");
+
+  if (respuestasA && respuestasB && !mainResultShown) {
+    // Both done! Calculate and show result
+    mainResultShown = true;
+    if (inProgress) inProgress.style.display = "none";
+    if (resultEl) resultEl.style.display = "flex";
+    showMainResult(respuestasA, respuestasB);
+  } else if (sujetoAId && sujetoBId) {
+    // Both registered, quiz in progress
+    if (inProgress) inProgress.style.display = "flex";
+    if (resultEl && !mainResultShown) resultEl.style.display = "none";
+  } else {
+    // Only one registered
+    if (inProgress) inProgress.style.display = "none";
+    if (resultEl && !mainResultShown) resultEl.style.display = "none";
+  }
+}
+
+function calculateCompatibilityMain(answersA, answersB) {
+  const binaryFields = [
+    "prefer_dinero_amor", "prefer_playa_montana", "prefer_noche_dia",
+    "prefer_netflix_fiesta", "prefer_perros_gatos", "prefer_llamada_mensaje",
+    "prefer_cafe_chocolate"
+  ];
+
+  let totalPoints = 0;
+  let maxPoints = 0;
+
+  // Binary preferences (7 questions)
+  binaryFields.forEach((field) => {
+    maxPoints += 1;
+    const a = answersA[field];
+    const b = answersB[field];
+    if (a && b && a === b) {
+      totalPoints += 1;
+    }
+  });
+
+  // Color favorito
+  maxPoints += 1;
+  if (answersA.color_favorito && answersB.color_favorito) {
+    if (answersA.color_favorito === answersB.color_favorito) {
+      totalPoints += 1;
+    }
+  }
+
+  // Multi-select fields
+  ["musica_favorita", "algo_feliz"].forEach((field) => {
+    maxPoints += 1;
+    const listA = Array.isArray(answersA[field]) ? answersA[field] : [];
+    const listB = Array.isArray(answersB[field]) ? answersB[field] : [];
+    if (listA.length > 0 && listB.length > 0) {
+      const overlap = listA.filter((v) => listB.includes(v));
+      const maxLen = Math.max(listA.length, listB.length);
+      totalPoints += maxLen > 0 ? overlap.length / maxLen : 0;
+    }
+  });
+
+  const rawPercent = maxPoints > 0 ? (totalPoints / maxPoints) * 100 : 50;
+  return Math.min(99, Math.max(5, Math.round(rawPercent)));
+}
+
+function getCompatibilityTextMain(percentage) {
+  if (percentage >= 90) return { label: "¡Almas Gemelas!", text: "Su conexión es increíble. Comparten una visión de la vida casi idéntica." };
+  if (percentage >= 75) return { label: "¡Gran Conexión!", text: "Tienen una química especial. Sus gustos se alinean de manera muy natural." };
+  if (percentage >= 60) return { label: "¡Buena Onda!", text: "Se complementan en lo importante y cada uno aporta algo diferente." };
+  if (percentage >= 45) return { label: "¡Interesante!", text: "Los opuestos se atraen. Esas diferencias pueden generar una chispa increíble." };
+  if (percentage >= 30) return { label: "¡Polos Opuestos!", text: "Son diferentes, pero pueden aprender muchísimo el uno del otro." };
+  return { label: "¡El Reto del Amor!", text: "Son mundos distintos, pero el amor todo lo puede." };
+}
+
+function showMainResult(answersA, answersB) {
+  const percentage = calculateCompatibilityMain(answersA, answersB);
+  const compatText = getCompatibilityTextMain(percentage);
+
+  const pctEl = document.getElementById("match-pct-num");
+  const circleFill = document.getElementById("match-circle-fill");
+  const labelEl = document.getElementById("match-label");
+  const textEl = document.getElementById("match-text");
+
+  // Animate circle
+  const circumference = 2 * Math.PI * 54;
+  const offset = circumference - (percentage / 100) * circumference;
+  setTimeout(() => {
+    if (circleFill) circleFill.style.strokeDashoffset = offset;
+  }, 200);
+
+  // Count-up animation
+  let current = 0;
+  const duration = 2500;
+  const start = Date.now();
+  const countUp = () => {
+    const elapsed = Date.now() - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    current = Math.round(eased * percentage);
+    if (pctEl) pctEl.textContent = current;
+    if (progress < 1) requestAnimationFrame(countUp);
+  };
+  requestAnimationFrame(countUp);
+
+  if (labelEl) labelEl.textContent = compatText.label;
+  if (textEl) textEl.textContent = compatText.text;
+}
+
 function showQREnPantalla(sujeto) {
   const s = String(sujeto).toUpperCase();
   if (s === "A") {
@@ -842,14 +965,21 @@ async function initPlayersScreenRealtime() {
 
   const { data: existing } = await supabase
     .from("participantes_valentine")
-    .select("id, nombre, genero, signo_zodiacal, sujeto")
+    .select("id, nombre, genero, signo_zodiacal, sujeto, respuestas")
     .eq("codigo_par", codigoParActual);
 
   (existing || []).forEach((row) => {
-    if (row.sujeto === "A") sujetoAId = row.id;
-    if (row.sujeto === "B") sujetoBId = row.id;
+    if (row.sujeto === "A") {
+      sujetoAId = row.id;
+      if (row.respuestas && Object.keys(row.respuestas).length > 0) respuestasA = row.respuestas;
+    }
+    if (row.sujeto === "B") {
+      sujetoBId = row.id;
+      if (row.respuestas && Object.keys(row.respuestas).length > 0) respuestasB = row.respuestas;
+    }
     showNombreEnPantalla(row.sujeto, row.nombre, row.genero, row.signo_zodiacal);
   });
+  updateMatchArea();
 
   supabase
     .channel("players-screen-" + codigoParActual)
@@ -870,8 +1000,15 @@ async function initPlayersScreenRealtime() {
       (payload) => {
         const row = payload.new;
         if (row.codigo_par !== codigoParActual) return;
-        if (row.sujeto === "A") showNombreEnPantalla("A", row.nombre, row.genero, row.signo_zodiacal);
-        if (row.sujeto === "B") showNombreEnPantalla("B", row.nombre, row.genero, row.signo_zodiacal);
+        if (row.sujeto === "A") {
+          showNombreEnPantalla("A", row.nombre, row.genero, row.signo_zodiacal);
+          if (row.respuestas && Object.keys(row.respuestas).length > 0) respuestasA = row.respuestas;
+        }
+        if (row.sujeto === "B") {
+          showNombreEnPantalla("B", row.nombre, row.genero, row.signo_zodiacal);
+          if (row.respuestas && Object.keys(row.respuestas).length > 0) respuestasB = row.respuestas;
+        }
+        updateMatchArea();
       }
     )
     .on(
@@ -920,6 +1057,21 @@ function launchExperience() {
   window.codigoPar = codigoParActual;
   sujetoAId = null;
   sujetoBId = null;
+  respuestasA = null;
+  respuestasB = null;
+  mainResultShown = false;
+
+  // Reset match area
+  const matchArea = document.getElementById("match-area");
+  if (matchArea) matchArea.style.display = "none";
+  const matchResult = document.getElementById("match-result");
+  if (matchResult) matchResult.style.display = "none";
+  const matchProgress = document.getElementById("match-in-progress");
+  if (matchProgress) matchProgress.style.display = "flex";
+  const circleFill = document.getElementById("match-circle-fill");
+  if (circleFill) circleFill.style.strokeDashoffset = "339.292";
+  const pctNum = document.getElementById("match-pct-num");
+  if (pctNum) pctNum.textContent = "0";
 
   document.querySelector(".start-screen").style.opacity = "0";
   setTimeout(() => {
