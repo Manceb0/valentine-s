@@ -424,24 +424,27 @@ body {
 
 .players-title {
   font-family: "Great Vibes", cursive;
-  font-size: 2.5em;
+  font-size: 3em;
   color: #ff69b4;
   text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
-  margin: 0 0 10px;
+  margin: 0 0 8px;
+  animation: titleGlow 3s ease-in-out infinite alternate;
 }
 
 .players-subtitle {
   font-family: Arial, sans-serif;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 1em;
-  margin-bottom: 40px;
-  letter-spacing: 1px;
+  margin-bottom: 45px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-size: 0.85em;
 }
 
 .players-inputs {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   gap: 80px;
   margin-bottom: 50px;
   flex-wrap: wrap;
@@ -451,7 +454,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  min-width: 240px;
 }
 
 .player-input-group label {
@@ -460,6 +464,7 @@ body {
   font-size: 1.3em;
   font-weight: bold;
   text-shadow: 0 0 10px rgba(255, 105, 180, 0.4);
+  letter-spacing: 1px;
 }
 
 .player-input-group input {
@@ -493,89 +498,135 @@ body {
 }
 
 .players-qr-row {
-  gap: 60px;
+  gap: 80px;
 }
 
 .players-qr-row .qr-wrap {
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 105, 180, 0.05) 100%);
+  border: 1.5px solid rgba(255, 105, 180, 0.2);
+  border-radius: 20px;
   margin: 8px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.players-qr-row .qr-wrap:hover {
+  border-color: rgba(255, 105, 180, 0.4);
+  box-shadow: 0 4px 24px rgba(255, 105, 180, 0.15);
 }
 
 .players-qr-row .qr-wrap canvas {
   display: block;
+  border-radius: 8px;
 }
 
 .qr-legend {
-  font-size: 0.9em;
-  color: rgba(255, 255, 255, 0.8);
-  margin: 8px 0 0;
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 10px 0 0;
   text-align: center;
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.3px;
 }
 
 .players-screen .nombre-wrap {
   text-align: center;
-  padding: 12px 0;
+  padding: 28px 32px 22px;
+  background: linear-gradient(135deg, rgba(255, 105, 180, 0.12) 0%, rgba(180, 50, 120, 0.08) 100%);
+  border: 1.5px solid rgba(255, 105, 180, 0.35);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  min-width: 200px;
+  box-shadow: 0 4px 24px rgba(255, 105, 180, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: cardAppear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes cardAppear {
+  0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .players-screen .nombre-registrado {
   display: block;
-  font-size: 1.2em;
+  font-family: "Great Vibes", cursive;
+  font-size: 2em;
   color: #ff69b4;
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
-  margin-bottom: 2px;
+  text-shadow: 0 0 16px rgba(255, 105, 180, 0.5);
+  margin-bottom: 10px;
+  line-height: 1.2;
 }
 
 .players-screen .genero-registrado {
-  display: block;
-  font-size: 0.95em;
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 8px;
+  display: inline-block;
+  font-family: Arial, sans-serif;
+  font-size: 0.85em;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 105, 180, 0.18);
+  border: 1px solid rgba(255, 105, 180, 0.35);
+  border-radius: 20px;
+  padding: 5px 16px;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
 }
 
 .players-screen .btn-resetear-sujeto {
   background: transparent;
-  border: 1px solid rgba(255, 105, 180, 0.6);
-  color: rgba(255, 255, 255, 0.9);
-  padding: 6px 14px;
-  font-size: 0.85em;
-  border-radius: 16px;
+  border: 1.5px solid rgba(255, 105, 180, 0.45);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 20px;
+  font-size: 0.8em;
+  border-radius: 20px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-top: 4px;
 }
 
 .players-screen .btn-resetear-sujeto:hover {
   background: rgba(255, 105, 180, 0.2);
+  border-color: rgba(255, 105, 180, 0.7);
+  box-shadow: 0 0 12px rgba(255, 105, 180, 0.3);
+  color: #fff;
 }
 
 .players-screen .btn-volver-qr {
-  margin-top: 20px;
-  padding: 12px 28px;
-  font-size: 1em;
+  margin-top: 24px;
+  padding: 12px 32px;
+  font-size: 0.9em;
   border: 2px solid #ff69b4;
-  border-radius: 24px;
-  background: rgba(255, 105, 180, 0.15);
+  border-radius: 25px;
+  background: rgba(255, 105, 180, 0.12);
   color: #ff69b4;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
 }
 
 .players-screen .btn-volver-qr:hover {
   background: rgba(255, 105, 180, 0.25);
-  box-shadow: 0 0 16px rgba(255, 105, 180, 0.4);
+  box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+  transform: translateY(-1px);
 }
 
 .players-codigo {
-  margin-top: 24px;
-  font-size: 1.1em;
-  color: rgba(255, 255, 255, 0.9);
+  margin-top: 28px;
+  font-size: 1em;
+  color: rgba(255, 255, 255, 0.75);
+  font-family: Arial, sans-serif;
+  letter-spacing: 0.5px;
 }
 
 .players-codigo strong {
   color: #ff69b4;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
+  font-size: 1.15em;
+  text-shadow: 0 0 8px rgba(255, 105, 180, 0.3);
 }
 
 .continue-button {

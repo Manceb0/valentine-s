@@ -673,7 +673,10 @@ function showNombreEnPantalla(sujeto, nombre, genero) {
       if (legend) legend.style.display = "none";
       if (nombreWrap) nombreWrap.style.display = "block";
       if (display) display.textContent = nombre || "Corazón 1";
-      if (generoDisplay) generoDisplay.textContent = genero ? " · " + genero : "";
+      if (generoDisplay) {
+        generoDisplay.textContent = genero || "";
+        generoDisplay.style.display = genero ? "inline-block" : "none";
+      }
     }
   } else if (s === "B") {
     lastParticipantB = { nombre: nombre || null, genero: genero || null };
@@ -687,7 +690,10 @@ function showNombreEnPantalla(sujeto, nombre, genero) {
       if (legend) legend.style.display = "none";
       if (nombreWrap) nombreWrap.style.display = "block";
       if (display) display.textContent = nombre || "Corazón 2";
-      if (generoDisplay) generoDisplay.textContent = genero ? " · " + genero : "";
+      if (generoDisplay) {
+        generoDisplay.textContent = genero || "";
+        generoDisplay.style.display = genero ? "inline-block" : "none";
+      }
     }
   }
   updateVolverQrButton();
@@ -719,13 +725,19 @@ function setVistaQR(mostrarQR) {
       const d = document.getElementById("nombre-a-display");
       const g = document.getElementById("genero-a-display");
       if (d) d.textContent = lastParticipantA.nombre || "Corazón 1";
-      if (g) g.textContent = lastParticipantA.genero ? " · " + lastParticipantA.genero : "";
+      if (g) {
+        g.textContent = lastParticipantA.genero || "";
+        g.style.display = lastParticipantA.genero ? "inline-block" : "none";
+      }
     }
     if (sujetoBId) {
       const d = document.getElementById("nombre-b-display");
       const g = document.getElementById("genero-b-display");
       if (d) d.textContent = lastParticipantB.nombre || "Corazón 2";
-      if (g) g.textContent = lastParticipantB.genero ? " · " + lastParticipantB.genero : "";
+      if (g) {
+        g.textContent = lastParticipantB.genero || "";
+        g.style.display = lastParticipantB.genero ? "inline-block" : "none";
+      }
     }
   }
   const btn = document.getElementById("btn-volver-qr");
