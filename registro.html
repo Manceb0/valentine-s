@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Valentine's</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+</head>
+<body class="registro-page">
+  <p id="registro-sin-codigo" class="registro-sin-codigo" style="display: none;">Escanea el QR de la pantalla para obtener el código de pareja.</p>
+  <div id="registro-form-container" class="registro-container">
+    <h1 class="registro-title">Regístrate</h1>
+    <p class="registro-subtitle">Valentine's — Amorous Symphony</p>
+    <form id="form-registro" class="form-registro">
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" required placeholder="Tu nombre" maxlength="100">
+      </div>
+      <div class="form-group">
+        <label for="fecha_nacimiento">Fecha de nacimiento</label>
+        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+      </div>
+      <div class="form-group">
+        <label for="carrera">Carrera</label>
+        <select id="carrera" name="carrera" required>
+          <option value="">Selecciona una carrera</option>
+          <option value="Ingeniería">Ingeniería</option>
+          <option value="Medicina">Medicina</option>
+          <option value="Derecho">Derecho</option>
+          <option value="Administración">Administración</option>
+          <option value="Arquitectura">Arquitectura</option>
+          <option value="Psicología">Psicología</option>
+          <option value="Comunicación">Comunicación</option>
+          <option value="Diseño">Diseño</option>
+          <option value="Otra">Otra</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="genero">Género</label>
+        <select id="genero" name="genero" required>
+          <option value="">Selecciona</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Otro">Otro</option>
+          <option value="Prefiero no decir">Prefiero no decir</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="signo_zodiacal">Signo zodiacal</label>
+        <select id="signo_zodiacal" name="signo_zodiacal">
+          <option value="">Selecciona tu signo</option>
+          <option value="Aries">Aries</option>
+          <option value="Tauro">Tauro</option>
+          <option value="Géminis">Géminis</option>
+          <option value="Cáncer">Cáncer</option>
+          <option value="Leo">Leo</option>
+          <option value="Virgo">Virgo</option>
+          <option value="Libra">Libra</option>
+          <option value="Escorpio">Escorpio</option>
+          <option value="Sagitario">Sagitario</option>
+          <option value="Capricornio">Capricornio</option>
+          <option value="Acuario">Acuario</option>
+          <option value="Piscis">Piscis</option>
+        </select>
+      </div>
+      <button type="submit" class="registro-submit" id="btn-enviar">Enviar</button>
+      <p id="registro-error" class="registro-error" style="display: none;"></p>
+    </form>
+  </div>
+  <div id="registro-success" class="registro-success" style="display: none;">
+    <div class="success-content">
+      <span class="success-icon">❤</span>
+      <h2>¡Gracias!</h2>
+      <p>Te has registrado correctamente.</p>
+    </div>
+  </div>
+  <script type="module" src="registro.js"></script>
+</body>
+</html>
