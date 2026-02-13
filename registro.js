@@ -2,7 +2,7 @@ const params = new URLSearchParams(window.location.search);
 let sujeto = params.get("sujeto") || "";
 let codigo = params.get("codigo") || "";
 
-const TOTAL_STEPS = 19; // steps 0-18
+const TOTAL_STEPS = 20; // steps 0-19
 let currentStep = -1;
 let answers = {};
 let registroId = null;
@@ -22,7 +22,7 @@ const resultScreen = document.getElementById("quiz-result");
 function init() {
   if (needManualCode) {
     showStep("pre");
-    initManualCodeStep();
+    initPreFlowSteps();
   } else {
     updateTitle();
     showStep(0);
@@ -54,11 +54,16 @@ function showStep(step) {
     target.style.animation = "";
   }
 
+  const progressWrap = document.querySelector(".quiz-progress-wrap");
   if (typeof step === "number") {
     currentStep = step;
     const progress = ((step + 1) / TOTAL_STEPS) * 100;
     progressBar.style.width = progress + "%";
     stepCounter.textContent = `${step + 1} / ${TOTAL_STEPS}`;
+    if (progressWrap) progressWrap.style.display = "";
+  } else {
+    // Hide progress bar for pre-steps
+    if (progressWrap) progressWrap.style.display = "none";
   }
 
   errorEl.style.display = "none";
@@ -82,18 +87,119 @@ function goNext() {
   }
 }
 
-// ————— MANUAL CODE STEP —————
-function initManualCodeStep() {
-  const preCards = document.querySelectorAll("#sujeto-manual-options .prefer-card");
-  preCards.forEach((card) => {
-    card.addEventListener("click", () => {
+// ————— CODE GENERATION —————
+function generarCodigoPar() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+// ————— PRE-FLOW STEPS (mobile-only) —————
+function initPreFlowSteps() {
+  const btnCrear = document.getElementById("btn-crear-pareja");
+  const btnUnirse = document.getElementById("btn-unirse-pareja");
+  const btnCodeReady = document.getElementById("btn-code-ready");
+  const btnCopyCode = document.getElementById("btn-copy-code");
+  const btnJoinSubmit = document.getElementById("btn-join-submit");
+
+  // === "Crear pareja" ===
+  if (btnCrear) {
+    btnCrear.addEventListener("click", () => {
+      codigo = generarCodigoPar();
+      sujeto = "A";
+
+      // Show code on screen
+      const codeEl = document.getElementById("generated-code");
+      if (codeEl) codeEl.textContent = codigo;
+
+      showStep("pre-code");
+    });
+  }
+
+  // === Copy code ===
+  if (btnCopyCode) {
+    btnCopyCode.addEventListener("click", () => {
+      if (navigator.clipboard && codigo) {
+        navigator.clipboard.writeText(codigo).then(() => {
+          btnCopyCode.textContent = "✅";
+          setTimeout(() => { btnCopyCode.textContent = "📋"; }, 1500);
+        }).catch(() => {
+          // Fallback: select text
+          const codeEl = document.getElementById("generated-code");
+          if (codeEl) {
+            const range = document.createRange();
+            range.selectNodeContents(codeEl);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        });
+      }
+    });
+  }
+
+  // === "Mi pareja ya lo tiene" === (sujeto A: comprobar que B se unió)
+  if (btnCodeReady) {
+    btnCodeReady.addEventListener("click", () => {
+      if (sujeto !== "A") {
+        updateTitle();
+        showStep(0);
+        return;
+      }
+      showStep("pre-confirm");
+      checkPartnerJoined();
+    });
+  }
+
+  // Pre-confirm: Empezar el quiz
+  const btnConfirmStart = document.getElementById("btn-confirm-start");
+  if (btnConfirmStart) {
+    btnConfirmStart.addEventListener("click", () => {
+      updateTitle();
+      showStep(0);
+    });
+  }
+  // Reintentar
+  const btnConfirmRetry = document.getElementById("btn-confirm-retry");
+  if (btnConfirmRetry) {
+    btnConfirmRetry.addEventListener("click", () => {
+      document.getElementById("pre-confirm-actions").style.display = "none";
+      document.getElementById("pre-confirm-retry").style.display = "none";
+      document.getElementById("pre-confirm-status").style.display = "";
+      document.getElementById("pre-confirm-msg").textContent = "Comprobando...";
+      document.getElementById("pre-confirm-spinner").style.display = "";
+      checkPartnerJoined();
+    });
+  }
+  // Empezar sin confirmar
+  const btnConfirmSkip = document.getElementById("btn-confirm-skip");
+  if (btnConfirmSkip) {
+    btnConfirmSkip.addEventListener("click", () => {
+      updateTitle();
+      showStep(0);
+    });
+  }
+
+  // === "Tengo un código" ===
+  if (btnUnirse) {
+    btnUnirse.addEventListener("click", () => {
+      showStep("pre-join");
+      const codeInput = document.getElementById("codigo_manual");
+      if (codeInput) setTimeout(() => codeInput.focus(), 300);
+    });
+  }
+
+  // === Submit join code === (B: insertar stub para que A pueda confirmar)
+  if (btnJoinSubmit) {
+    btnJoinSubmit.addEventListener("click", async () => {
       const codeInput = document.getElementById("codigo_manual");
       const code = codeInput?.value?.trim().toUpperCase() || "";
       const errPre = document.getElementById("registro-error-pre");
 
       if (!code || code.length < 4) {
         if (errPre) {
-          errPre.textContent = "Ingresa el código de pareja primero";
+          errPre.textContent = "Ingresa el código que te compartió tu pareja";
           errPre.style.display = "block";
         }
         codeInput?.focus();
@@ -101,19 +207,108 @@ function initManualCodeStep() {
       }
 
       codigo = code;
-      sujeto = card.dataset.value;
+      sujeto = "B";
       updateTitle();
+      if (errPre) errPre.style.display = "none";
 
-      // Highlight selected
-      preCards.forEach((c) => c.classList.remove("selected", "not-selected"));
-      card.classList.add("selected");
-      preCards.forEach((c) => {
-        if (c !== card) c.classList.add("not-selected");
-      });
-
-      setTimeout(() => showStep(0), 400);
+      await insertStubForJoiner();
+      showStep(0);
     });
-  });
+  }
+
+  // Allow enter key on code input
+  const codeInput = document.getElementById("codigo_manual");
+  if (codeInput) {
+    codeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (btnJoinSubmit) btnJoinSubmit.click();
+      }
+    });
+  }
+}
+
+// ————— STUB INSERT (B se une: aparece en la lista para que A confirme) —————
+async function insertStubForJoiner() {
+  if (sujeto !== "B" || !codigo) return;
+  try {
+    const mod = await import("./supabaseClient.js");
+    const { data, error } = await mod.supabase
+      .from("participantes_valentine")
+      .insert({
+        codigo_par: codigo,
+        sujeto: "B",
+        nombre: "Por confirmar",
+      })
+      .select("id")
+      .single();
+    if (!error && data?.id) registroId = data.id;
+  } catch (err) {
+    console.warn("Stub insert:", err);
+  }
+}
+
+// ————— COMPROBAR QUE LA PAREJA SE UNIÓ (para A) —————
+async function checkPartnerJoined() {
+  const statusEl = document.getElementById("pre-confirm-status");
+  const msgEl = document.getElementById("pre-confirm-msg");
+  const spinnerEl = document.getElementById("pre-confirm-spinner");
+  const actionsEl = document.getElementById("pre-confirm-actions");
+  const retryEl = document.getElementById("pre-confirm-retry");
+
+  let supabase;
+  try {
+    const mod = await import("./supabaseClient.js");
+    supabase = mod.supabase;
+  } catch (err) {
+    if (msgEl) msgEl.textContent = "Sin conexión. Puedes empezar igual.";
+    if (spinnerEl) spinnerEl.style.display = "none";
+    if (retryEl) {
+      retryEl.style.display = "block";
+      retryEl.querySelector(".quiz-sub").textContent = "";
+    }
+    return;
+  }
+
+  const maxWait = 12000;
+  const interval = 1500;
+  const start = Date.now();
+
+  const check = async () => {
+    const { data, error } = await supabase
+      .from("participantes_valentine")
+      .select("id")
+      .eq("codigo_par", codigo)
+      .eq("sujeto", "B")
+      .maybeSingle();
+
+    if (!error && data) {
+      if (statusEl) statusEl.style.display = "none";
+      if (msgEl) msgEl.textContent = "";
+      if (spinnerEl) spinnerEl.style.display = "none";
+      if (actionsEl) {
+        actionsEl.style.display = "block";
+        const btn = document.getElementById("btn-confirm-start");
+        if (btn) btn.textContent = "¡Tu pareja se unió! Empezar el quiz →";
+      }
+      if (retryEl) retryEl.style.display = "none";
+      return true;
+    }
+    if (Date.now() - start >= maxWait) {
+      if (spinnerEl) spinnerEl.style.display = "none";
+      if (msgEl) msgEl.textContent = "Aún no vemos a tu pareja.";
+      if (statusEl) statusEl.style.display = "";
+      if (retryEl) retryEl.style.display = "block";
+      if (actionsEl) actionsEl.style.display = "none";
+      return false;
+    }
+    return false;
+  };
+
+  if (await check()) return;
+  const t = setInterval(async () => {
+    if (await check()) clearInterval(t);
+  }, interval);
 }
 
 // ————— NOMBRE STEP —————
@@ -300,8 +495,6 @@ function initNextChipsBtns() {
 
 // ————— SUPABASE: INSERT BASIC INFO —————
 async function insertBasicInfo() {
-  if (registroId) return; // already inserted
-
   let supabase;
   try {
     const mod = await import("./supabaseClient.js");
@@ -312,6 +505,20 @@ async function insertBasicInfo() {
   }
 
   try {
+    if (registroId) {
+      // B ya tiene fila (stub al unirse): actualizar con nombre, género, etc.
+      await supabase
+        .from("participantes_valentine")
+        .update({
+          nombre: answers.nombre || "Anónimo",
+          genero: answers.genero || null,
+          fecha_nacimiento: answers.fecha_nacimiento || null,
+          signo_zodiacal: answers.signo_zodiacal || null,
+        })
+        .eq("id", registroId);
+      return;
+    }
+
     const { data, error } = await supabase
       .from("participantes_valentine")
       .insert({
@@ -367,7 +574,7 @@ async function submitAllAnswers() {
     "prefer_perdonar_justicia", "prefer_hablar_espacio", "prefer_razon_corazon",
     "prefer_planificar_improvisar", "prefer_pocas_muchas", "prefer_feliz_razon",
     "prefer_presente_futuro", "prefer_dar_recibir",
-    "color_favorito", "valores_relacion", "musica_favorita", "algo_feliz"
+    "carrera", "color_favorito", "valores_relacion", "musica_favorita", "algo_feliz"
   ];
   answerFields.forEach((f) => {
     if (answers[f] !== undefined) respuestas[f] = answers[f];
@@ -541,6 +748,17 @@ function calculateCompatibility(myAnswers, partnerAnswers) {
   // Deep (2 pts each)
   deepFields.forEach((f) => processBinary(f, 2));
 
+  // Carrera (1 pt)
+  maxPoints += 1;
+  if (myAnswers.carrera && partnerAnswers.carrera) {
+    if (myAnswers.carrera === partnerAnswers.carrera) {
+      totalPoints += 1;
+      matches.push({ icon: "📚", text: `¡Los dos en ${myAnswers.carrera}! Comparten el mismo camino académico.` });
+    } else {
+      diffs.push({ icon: "📚", text: `Tú ${myAnswers.carrera}, tu pareja ${partnerAnswers.carrera}. Diferentes áreas que se complementan.` });
+    }
+  }
+
   // Color favorito (1 pt)
   maxPoints += 1;
   if (myAnswers.color_favorito && partnerAnswers.color_favorito) {
@@ -637,7 +855,7 @@ function showCompatibilityResult(partnerName, partnerRespuestas) {
       "prefer_perdonar_justicia", "prefer_hablar_espacio", "prefer_razon_corazon",
       "prefer_planificar_improvisar", "prefer_pocas_muchas", "prefer_feliz_razon",
       "prefer_presente_futuro", "prefer_dar_recibir",
-      "color_favorito", "valores_relacion", "musica_favorita", "algo_feliz"
+      "carrera", "color_favorito", "valores_relacion", "musica_favorita", "algo_feliz"
     ];
     fields.forEach((f) => { if (answers[f] !== undefined) myRespuestas[f] = answers[f]; });
 

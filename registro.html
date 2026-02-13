@@ -15,17 +15,59 @@
       <span class="quiz-step-counter" id="quiz-step-counter"></span>
     </div>
 
-    <!-- PRE: Código manual (solo si no viene por QR) -->
-    <div class="quiz-step" data-step="pre" style="display:none;">
-      <h2 class="quiz-question">Código de pareja</h2>
-      <p class="quiz-sub">Ingresa el código que aparece en la pantalla</p>
-      <input type="text" id="codigo_manual" class="quiz-input" placeholder="Ej: A7F3K2" maxlength="6" autocomplete="off">
-      <p class="quiz-sub" style="margin-top:20px;">¿Cuál eres tú?</p>
-      <div class="prefer-options" id="sujeto-manual-options">
-        <button type="button" class="prefer-card prefer-card-sm" data-value="A">💗<span>Corazón 1</span></button>
-        <span class="prefer-vs">o</span>
-        <button type="button" class="prefer-card prefer-card-sm" data-value="B">💜<span>Corazón 2</span></button>
+    <!-- PRE: Elegir flujo (solo si no viene por QR) -->
+    <div class="quiz-step" data-step="pre">
+      <h2 class="quiz-question">¿Cómo quieren jugar? 💕</h2>
+      <p class="quiz-sub">Elige una opción para empezar</p>
+      <div class="pre-flow-options">
+        <button type="button" class="pre-flow-card" id="btn-crear-pareja">
+          <span class="pre-flow-icon">💝</span>
+          <span class="pre-flow-title">Crear pareja</span>
+          <span class="pre-flow-desc">Genera un código y compártelo</span>
+        </button>
+        <button type="button" class="pre-flow-card" id="btn-unirse-pareja">
+          <span class="pre-flow-icon">🔗</span>
+          <span class="pre-flow-title">Tengo un código</span>
+          <span class="pre-flow-desc">Mi pareja ya creó uno</span>
+        </button>
       </div>
+    </div>
+
+    <!-- PRE-CODE: Código generado para compartir -->
+    <div class="quiz-step" data-step="pre-code">
+      <h2 class="quiz-question">¡Tu código de pareja! 💌</h2>
+      <p class="quiz-sub">Comparte este código con tu pareja para que se una</p>
+      <div class="generated-code-wrap">
+        <div class="generated-code" id="generated-code"></div>
+        <button type="button" class="btn-copy-code" id="btn-copy-code" title="Copiar código">📋</button>
+      </div>
+      <p class="quiz-sub generated-code-hint">Dile a tu pareja que abra este link y elija "Tengo un código"</p>
+      <button type="button" class="quiz-next-btn" id="btn-code-ready">Mi pareja ya lo tiene →</button>
+    </div>
+
+    <!-- PRE-CONFIRM: Comprobar que la pareja se unió (solo quien creó el código) -->
+    <div class="quiz-step" data-step="pre-confirm">
+      <h2 class="quiz-question">¿Tu pareja ya se unió? 💕</h2>
+      <div class="pre-confirm-status" id="pre-confirm-status">
+        <div class="pre-confirm-spinner" id="pre-confirm-spinner"></div>
+        <p class="pre-confirm-msg" id="pre-confirm-msg">Comprobando...</p>
+      </div>
+      <div class="pre-confirm-actions" id="pre-confirm-actions" style="display:none;">
+        <button type="button" class="quiz-next-btn" id="btn-confirm-start">Empezar el quiz →</button>
+      </div>
+      <div class="pre-confirm-retry" id="pre-confirm-retry" style="display:none;">
+        <p class="quiz-sub">Pide a tu pareja que ingrese el código e inténtalo de nuevo.</p>
+        <button type="button" class="quiz-next-btn" id="btn-confirm-retry">Reintentar</button>
+        <button type="button" class="quiz-next-btn quiz-next-btn-ghost" id="btn-confirm-skip">Empezar sin confirmar</button>
+      </div>
+    </div>
+
+    <!-- PRE-JOIN: Ingresar código -->
+    <div class="quiz-step" data-step="pre-join">
+      <h2 class="quiz-question">Código de pareja 🔗</h2>
+      <p class="quiz-sub">Ingresa el código que te compartió tu pareja</p>
+      <input type="text" id="codigo_manual" class="quiz-input" placeholder="Ej: A7F3K2" maxlength="6" autocomplete="off" style="text-transform:uppercase; text-align:center; font-size:1.5em; letter-spacing:4px;">
+      <button type="button" class="quiz-next-btn" id="btn-join-submit">Unirme →</button>
       <p id="registro-error-pre" class="registro-error" style="display:none;"></p>
     </div>
 
@@ -58,8 +100,25 @@
       <button type="button" class="quiz-next-btn" id="btn-birthday-next">Siguiente →</button>
     </div>
 
-    <!-- ═══ PREGUNTAS LIGERAS (3-6) ═══ -->
+    <!-- 3: Carrera -->
     <div class="quiz-step" data-step="3">
+      <h2 class="quiz-question">¿Qué estudias o te gustaría estudiar? 📚</h2>
+      <p class="quiz-sub">Elige una</p>
+      <div class="chip-group" data-field="carrera" data-max="1" data-auto="true">
+        <button type="button" class="chip" data-value="Ingeniería">Ingeniería</button>
+        <button type="button" class="chip" data-value="Medicina">Medicina</button>
+        <button type="button" class="chip" data-value="Derecho">Derecho</button>
+        <button type="button" class="chip" data-value="Artes / Diseño">Artes / Diseño</button>
+        <button type="button" class="chip" data-value="Administración">Administración</button>
+        <button type="button" class="chip" data-value="Ciencias">Ciencias</button>
+        <button type="button" class="chip" data-value="Humanidades">Humanidades</button>
+        <button type="button" class="chip" data-value="Educación">Educación</button>
+        <button type="button" class="chip" data-value="Otra">Otra</button>
+      </div>
+    </div>
+
+    <!-- ═══ PREGUNTAS LIGERAS (4-7) ═══ -->
+    <div class="quiz-step" data-step="4">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_dinero_amor">
         <button type="button" class="prefer-card" data-value="Dinero">💰<span>Dinero</span></button>
@@ -67,7 +126,7 @@
         <button type="button" class="prefer-card" data-value="Amor">❤️<span>Amor</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="4">
+    <div class="quiz-step" data-step="5">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_playa_montana">
         <button type="button" class="prefer-card" data-value="Playa">🏖️<span>Playa</span></button>
@@ -75,7 +134,7 @@
         <button type="button" class="prefer-card" data-value="Montaña">🏔️<span>Montaña</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="5">
+    <div class="quiz-step" data-step="6">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_noche_dia">
         <button type="button" class="prefer-card" data-value="Noche">🌙<span>Noche</span></button>
@@ -83,7 +142,7 @@
         <button type="button" class="prefer-card" data-value="Día">☀️<span>Día</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="6">
+    <div class="quiz-step" data-step="7">
       <h2 class="quiz-question">¿Qué prefieres?</h2>
       <div class="prefer-options" data-field="prefer_netflix_fiesta">
         <button type="button" class="prefer-card" data-value="Netflix en casa">🎬<span>Netflix en casa</span></button>
@@ -93,7 +152,7 @@
     </div>
 
     <!-- ═══ PREGUNTAS PROFUNDAS (7-14) ═══ -->
-    <div class="quiz-step" data-step="7">
+    <div class="quiz-step" data-step="8">
       <h2 class="quiz-question">En una relación...</h2>
       <div class="prefer-options" data-field="prefer_perdonar_justicia">
         <button type="button" class="prefer-card" data-value="Perdonar">🕊️<span>Perdonar fácil</span></button>
@@ -101,7 +160,7 @@
         <button type="button" class="prefer-card" data-value="Consecuencias">⚖️<span>Que asuma consecuencias</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="8">
+    <div class="quiz-step" data-step="9">
       <h2 class="quiz-question">Cuando hay un problema...</h2>
       <div class="prefer-options" data-field="prefer_hablar_espacio">
         <button type="button" class="prefer-card" data-value="Hablarlo ya">🗣️<span>Hablarlo de una vez</span></button>
@@ -109,7 +168,7 @@
         <button type="button" class="prefer-card" data-value="Dar espacio">🧘<span>Dar espacio primero</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="9">
+    <div class="quiz-step" data-step="10">
       <h2 class="quiz-question">¿Qué te guía más?</h2>
       <div class="prefer-options" data-field="prefer_razon_corazon">
         <button type="button" class="prefer-card" data-value="La razón">🧠<span>La razón</span></button>
@@ -117,7 +176,7 @@
         <button type="button" class="prefer-card" data-value="El corazón">💗<span>El corazón</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="10">
+    <div class="quiz-step" data-step="11">
       <h2 class="quiz-question">En la vida prefieres...</h2>
       <div class="prefer-options" data-field="prefer_planificar_improvisar">
         <button type="button" class="prefer-card" data-value="Planificar">📋<span>Tener todo planeado</span></button>
@@ -125,7 +184,7 @@
         <button type="button" class="prefer-card" data-value="Improvisar">🌊<span>Fluir e improvisar</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="11">
+    <div class="quiz-step" data-step="12">
       <h2 class="quiz-question">Prefieres tener...</h2>
       <div class="prefer-options" data-field="prefer_pocas_muchas">
         <button type="button" class="prefer-card" data-value="Pocas profundas">💎<span>Pocas amistades pero profundas</span></button>
@@ -133,7 +192,7 @@
         <button type="button" class="prefer-card" data-value="Muchas amistades">🎭<span>Muchos amigos y conocidos</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="12">
+    <div class="quiz-step" data-step="13">
       <h2 class="quiz-question">¿Qué es más importante?</h2>
       <div class="prefer-options" data-field="prefer_feliz_razon">
         <button type="button" class="prefer-card" data-value="Ser feliz">😊<span>Ser feliz</span></button>
@@ -141,7 +200,7 @@
         <button type="button" class="prefer-card" data-value="Tener razón">🏆<span>Tener la razón</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="13">
+    <div class="quiz-step" data-step="14">
       <h2 class="quiz-question">¿Cómo vives?</h2>
       <div class="prefer-options" data-field="prefer_presente_futuro">
         <button type="button" class="prefer-card" data-value="Vivir el momento">🌅<span>Vivir el momento</span></button>
@@ -149,7 +208,7 @@
         <button type="button" class="prefer-card" data-value="Construir futuro">🏗️<span>Construir el futuro</span></button>
       </div>
     </div>
-    <div class="quiz-step" data-step="14">
+    <div class="quiz-step" data-step="15">
       <h2 class="quiz-question">En el amor prefieres...</h2>
       <div class="prefer-options" data-field="prefer_dar_recibir">
         <button type="button" class="prefer-card" data-value="Dar cariño">🫂<span>Dar cariño</span></button>
@@ -159,7 +218,7 @@
     </div>
 
     <!-- ═══ SELECCIONES (15-19) ═══ -->
-    <div class="quiz-step" data-step="15">
+    <div class="quiz-step" data-step="16">
       <h2 class="quiz-question">Tu color favorito 🎨</h2>
       <div class="chip-group" data-field="color_favorito" data-max="1" data-auto="true">
         <button type="button" class="chip chip-color" data-value="Rojo"><span class="chip-dot" style="background:#e74c3c"></span>Rojo</button>
@@ -173,7 +232,7 @@
       </div>
     </div>
 
-    <div class="quiz-step" data-step="16">
+    <div class="quiz-step" data-step="17">
       <h2 class="quiz-question">¿Qué valoras más en una relación? 💞</h2>
       <p class="quiz-sub">Elige hasta 3</p>
       <div class="chip-group" data-field="valores_relacion" data-max="3">
@@ -191,7 +250,7 @@
       <button type="button" class="quiz-next-btn quiz-next-chips">Siguiente →</button>
     </div>
 
-    <div class="quiz-step" data-step="17">
+    <div class="quiz-step" data-step="18">
       <h2 class="quiz-question">Música favorita 🎵</h2>
       <p class="quiz-sub">Elige hasta 3</p>
       <div class="chip-group" data-field="musica_favorita" data-max="3">
@@ -209,7 +268,7 @@
       <button type="button" class="quiz-next-btn quiz-next-chips">Siguiente →</button>
     </div>
 
-    <div class="quiz-step" data-step="18">
+    <div class="quiz-step" data-step="19">
       <h2 class="quiz-question">¿Qué te hace feliz? 😊</h2>
       <p class="quiz-sub">Elige hasta 3</p>
       <div class="chip-group" data-field="algo_feliz" data-max="3">

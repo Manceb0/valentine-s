@@ -875,6 +875,10 @@ function calculateCompatibilityMain(answersA, answersB) {
     if (a && b && a === b) totalPoints += 2;
   });
 
+  // Carrera (1 pt)
+  maxPoints += 1;
+  if (answersA.carrera && answersB.carrera && answersA.carrera === answersB.carrera) totalPoints += 1;
+
   // Color favorito (1 pt)
   maxPoints += 1;
   if (answersA.color_favorito && answersB.color_favorito) {

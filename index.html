@@ -37,7 +37,9 @@
       var params = new URLSearchParams(window.location.search);
       var forceRegistro = params.has('registro') || params.get('v') === 'registro';
       if (isMobile || forceRegistro) {
-        window.location.replace('registro.html');
+        // Preserve any QR params (sujeto, codigo) when redirecting
+        var search = window.location.search || '';
+        window.location.replace('registro.html' + search);
         return;
       }
     })();
